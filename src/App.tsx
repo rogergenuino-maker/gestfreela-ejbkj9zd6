@@ -11,6 +11,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Companies from './pages/Companies'
 import Freelancers from './pages/Freelancers'
+import FreelancerForm from './pages/FreelancerForm'
 import Contracts from './pages/Contracts'
 import NotFound from './pages/NotFound'
 
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/dashboard" element={<Index />} />
               <Route path="/companies" element={<Companies />} />
               <Route path="/freelancers" element={<Freelancers />} />
+              <Route path="/freelancers/new" element={<FreelancerForm />} />
               <Route path="/contracts" element={<Contracts />} />
             </Route>
           </Route>

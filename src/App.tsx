@@ -8,6 +8,7 @@ import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import Index from './pages/Index'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import Companies from './pages/Companies'
 import Freelancers from './pages/Freelancers'
 import Contracts from './pages/Contracts'
@@ -22,6 +23,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>

@@ -88,7 +88,13 @@ export default function Login() {
           <div>
             <h1 className="text-4xl font-bold mb-4">Gerencie seus contratos de forma simples.</h1>
             <p className="text-zinc-300 text-lg max-w-md">
-              A plataforma definitiva para conectar empresas e freelancers de segurança patrimonial.
+              <p data-start="960" data-end="1074">
+                <strong data-start="960" data-end="1074">
+                  Plataforma especializada na conexão entre empresas e profissionais de Segurança
+                  Patrimonial e Bombeiros Civis.
+                </strong>
+              </p>
+              <p data-start="1076" data-end="1123"></p>
             </p>
           </div>
         </div>

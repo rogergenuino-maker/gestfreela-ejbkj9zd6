@@ -1,6 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { FileText, CheckCircle2, Users, Building2, TrendingUp } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import {
+  FileText,
+  CheckCircle2,
+  Users,
+  Building2,
+  TrendingUp,
+  ShieldCheck,
+  Clock,
+  XCircle,
+  ArrowRight,
+} from 'lucide-react'
 import { getDashboardStats, DashboardStats } from '@/services/dashboard'
 
 export default function Index() {
@@ -56,28 +67,59 @@ export default function Index() {
         />
       </div>
 
-      {/* Placeholder for future charts or lists */}
       <div
         className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 animate-fade-in-up"
         style={{ animationDelay: '500ms' }}
       >
+        <Card className="lg:col-span-3 shadow-sm border-border/50 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-background">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-xl">Status de Documentos</CardTitle>
+            <ShieldCheck className="w-5 h-5 text-blue-600" />
+          </CardHeader>
+          <CardContent className="space-y-6 pt-4">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground flex items-center justify-center gap-1">
+                  <Clock className="w-4 h-4 text-amber-500" />
+                  Pendentes
+                </p>
+                <p className="text-2xl font-bold">{loading ? '...' : stats?.docsPendentes}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground flex items-center justify-center gap-1">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  Aprovados
+                </p>
+                <p className="text-2xl font-bold">{loading ? '...' : stats?.docsAprovados}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground flex items-center justify-center gap-1">
+                  <XCircle className="w-4 h-4 text-rose-500" />
+                  Rejeitados
+                </p>
+                <p className="text-2xl font-bold">{loading ? '...' : stats?.docsRejeitados}</p>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <Link
+                to="/admin/documents"
+                className="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2"
+              >
+                Gerenciar Documentos
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="lg:col-span-4 shadow-sm border-border/50">
           <CardHeader>
             <CardTitle>Atividade Recente</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] flex items-center justify-center border-2 border-dashed rounded-md text-muted-foreground bg-muted/20">
+            <div className="h-[200px] flex items-center justify-center border-2 border-dashed rounded-md text-muted-foreground bg-muted/20">
               Gráfico de Atividades
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-3 shadow-sm border-border/50">
-          <CardHeader>
-            <CardTitle>Últimos Contratos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px] flex items-center justify-center border-2 border-dashed rounded-md text-muted-foreground bg-muted/20">
-              Lista de Contratos Recentes
             </div>
           </CardContent>
         </Card>

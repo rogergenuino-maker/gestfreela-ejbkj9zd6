@@ -5,6 +5,9 @@ export interface DashboardStats {
   freelancersCount: number
   contractsCount: number
   activeContractsCount: number
+  docsPendentes: number
+  docsAprovados: number
+  docsRejeitados: number
 }
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {
@@ -12,11 +15,31 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     // using 'as any' to bypass strict type checking before types are generated
     const client = supabase as any
 
-    const [empresas, freelancers, contratos, activeContracts] = await Promise.all([
+    const [
+      empresas,
+      freelancers,
+      contratos,
+      activeContracts,
+      docsPendentes,
+      docsAprovados,
+      docsRejeitados,
+    ] = await Promise.all([
       client.from('empresas').select('*', { count: 'exact', head: true }),
       client.from('freelancers').select('*', { count: 'exact', head: true }),
       client.from('contratos').select('*', { count: 'exact', head: true }),
       client.from('contratos').select('*', { count: 'exact', head: true }).eq('status', 'ativo'),
+      client
+        .from('documentos_validacao')
+        .select('*', { count: 'exact', head: true })
+        .ilike('status_verificacao', 'Pendente'),
+      client
+        .from('documentos_validacao')
+        .select('*', { count: 'exact', head: true })
+        .ilike('status_verificacao', 'Aprovado'),
+      client
+        .from('documentos_validacao')
+        .select('*', { count: 'exact', head: true })
+        .ilike('status_verificacao', 'Rejeitado'),
     ])
 
     return {
@@ -24,6 +47,9 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
       freelancersCount: freelancers.count || 0,
       contractsCount: contratos.count || 0,
       activeContractsCount: activeContracts.count || 0,
+      docsPendentes: docsPendentes.count || 0,
+      docsAprovados: docsAprovados.count || 0,
+      docsRejeitados: docsRejeitados.count || 0,
     }
   } catch (error) {
     console.error('Error fetching dashboard stats:', error)
@@ -32,6 +58,9 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
       freelancersCount: 0,
       contractsCount: 0,
       activeContractsCount: 0,
+      docsPendentes: 0,
+      docsAprovados: 0,
+      docsRejeitados: 0,
     }
   }
 }

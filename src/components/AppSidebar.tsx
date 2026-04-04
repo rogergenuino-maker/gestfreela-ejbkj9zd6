@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Building2, Users, FileText, LogOut } from 'lucide-react'
+import { LayoutDashboard, Building2, Users, FileText, ShieldCheck, LogOut } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -14,10 +14,11 @@ import {
 import { useAuth } from '@/hooks/use-auth'
 
 const menuItems = [
-  { title: 'Dashboard', url: '/', icon: LayoutDashboard },
+  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Cadastro de Empresas', url: '/companies', icon: Building2 },
   { title: 'Cadastro de Freelancers', url: '/freelancers', icon: Users },
   { title: 'Gestão de Contratos', url: '/contracts', icon: FileText },
+  { title: 'Validação de Documentos', url: '/admin/documents', icon: ShieldCheck },
 ]
 
 export function AppSidebar() {

@@ -91,17 +91,18 @@ function Hero() {
           className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-blue-950 tracking-tight max-w-5xl mb-6 animate-fade-in-up"
           style={{ animationDelay: '100ms' }}
         >
-          Conecte Empresas e Freelancers de{' '}
+          Conectando Empresas e Freelancers de <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">
-            Segurança Patrimonial
+            Segurança Patrimonial e <br />
+            Bombeiros civis
           </span>
         </h1>
         <p
           className="text-lg sm:text-xl md:text-2xl text-blue-800/80 max-w-3xl mb-12 animate-fade-in-up"
           style={{ animationDelay: '200ms' }}
         >
-          A plataforma definitiva para gerenciar contratos, agendamentos e históricos de serviços
-          com total controle, segurança jurídica e eficiência.
+          A plataforma para gerenciar seus contratos, agendamentos e históricos de serviços com
+          controle, segurança e eficiência.
         </p>
         <div
           className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto animate-fade-in-up"

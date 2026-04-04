@@ -163,8 +163,8 @@ function Features() {
             Tudo que você precisa em um só lugar
           </h2>
           <p className="text-lg text-blue-600/80 max-w-2xl mx-auto">
-            Nossas ferramentas foram desenhadas para simplificar a sua rotina administrativa e
-            garantir a máxima segurança nas negociações.
+            Gestão inteligente para empresas e freelancers, integrando eventos, serviços e contratos
+            em um único sistema.
           </p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">

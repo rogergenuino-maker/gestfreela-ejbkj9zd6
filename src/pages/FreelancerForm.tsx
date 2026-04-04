@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -44,6 +44,7 @@ const formSchema = z.object({
 export default function FreelancerForm() {
   const { toast } = useToast()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [fileName, setFileName] = useState('')
 
@@ -103,8 +104,7 @@ export default function FreelancerForm() {
         description: 'O freelancer foi adicionado à base de talentos.',
         className: 'bg-green-50 border-green-200 text-green-900',
       })
-      form.reset()
-      setFileName('')
+      navigate('/freelancers')
     } catch (error) {
       console.error(error)
       toast({

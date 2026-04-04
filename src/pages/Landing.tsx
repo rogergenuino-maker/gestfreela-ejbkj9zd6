@@ -150,7 +150,7 @@ function Features() {
     },
     {
       title: 'Histórico de Serviços',
-      desc: 'Mantenha um registro completo e detalhado de todos os serviços prestados para fácil consulta e auditoria.',
+      desc: 'Mantenha um registro completo e detalhado de todos os serviços prestados para fácil consulta.',
       icon: History,
     },
   ]

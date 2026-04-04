@@ -12,17 +12,17 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     // using 'as any' to bypass strict type checking before types are generated
     const client = supabase as any
 
-    const [companies, freelancers, contracts, activeContracts] = await Promise.all([
-      client.from('companies').select('*', { count: 'exact', head: true }),
+    const [empresas, freelancers, contratos, activeContracts] = await Promise.all([
+      client.from('empresas').select('*', { count: 'exact', head: true }),
       client.from('freelancers').select('*', { count: 'exact', head: true }),
-      client.from('contracts').select('*', { count: 'exact', head: true }),
-      client.from('contracts').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+      client.from('contratos').select('*', { count: 'exact', head: true }),
+      client.from('contratos').select('*', { count: 'exact', head: true }).eq('status', 'ativo'),
     ])
 
     return {
-      companiesCount: companies.count || 0,
+      companiesCount: empresas.count || 0,
       freelancersCount: freelancers.count || 0,
-      contractsCount: contracts.count || 0,
+      contractsCount: contratos.count || 0,
       activeContractsCount: activeContracts.count || 0,
     }
   } catch (error) {

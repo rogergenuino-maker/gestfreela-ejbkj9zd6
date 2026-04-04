@@ -78,14 +78,16 @@ export default function Register() {
     if (data?.user) {
       const userId = data.user.id
       if (values.userType === 'company') {
-        await supabase.from('companies').insert({
-          id: userId,
-          name: values.name,
+        await supabase.from('empresas').insert({
+          user_id: userId,
+          nome_empresa: values.name,
+          email: values.email,
         })
       } else {
         await supabase.from('freelancers').insert({
-          id: userId,
-          name: values.name,
+          user_id: userId,
+          nome_completo: values.name,
+          email: values.email,
         })
       }
     }

@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthProvider } from '@/hooks/use-auth'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import Layout from './components/Layout'
+import Landing from './pages/Landing'
 import Index from './pages/Index'
 import Login from './pages/Login'
 import Companies from './pages/Companies'
@@ -19,11 +20,12 @@ const App = () => (
         <Toaster />
         <Sonner />
         <Routes>
+          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
 
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
-              <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<Index />} />
               <Route path="/companies" element={<Companies />} />
               <Route path="/freelancers" element={<Freelancers />} />
               <Route path="/contracts" element={<Contracts />} />

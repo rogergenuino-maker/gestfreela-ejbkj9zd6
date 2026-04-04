@@ -32,6 +32,9 @@ const registerSchema = z
     terms: z.boolean().refine((val) => val === true, {
       message: 'Você deve aceitar os termos de uso',
     }),
+    lgpd: z.boolean().refine((val) => val === true, {
+      message: 'Você deve autorizar o tratamento de dados para prosseguir',
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'As senhas não coincidem',
@@ -54,6 +57,7 @@ export default function Register() {
       confirmPassword: '',
       userType: undefined,
       terms: false,
+      lgpd: false,
     },
   })
 
@@ -77,6 +81,14 @@ export default function Register() {
 
     if (data?.user) {
       const userId = data.user.id
+
+      await supabase.from('perfis').insert({
+        id: userId,
+        lgpd_aceito: values.lgpd,
+        data_aceite_lgpd: new Date().toISOString(),
+        status_conta: 'ativo',
+      })
+
       if (values.userType === 'company') {
         await supabase.from('empresas').insert({
           user_id: userId,
@@ -97,7 +109,11 @@ export default function Register() {
       description: 'Sua conta foi criada com sucesso! Você já pode acessar a plataforma.',
     })
 
-    navigate('/')
+    if (values.userType === 'freelancer') {
+      navigate('/freelancers/documentos')
+    } else {
+      navigate('/')
+    }
     setIsLoading(false)
   }
 
@@ -276,6 +292,29 @@ export default function Register() {
                         <Link to="#" className="text-black hover:underline">
                           Política de Privacidade
                         </Link>
+                      </FormLabel>
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="lgpd"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 pt-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="border-zinc-300 data-[state=checked]:bg-black data-[state=checked]:text-white mt-1"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm font-normal text-zinc-600 cursor-pointer leading-tight">
+                        Autorizo o tratamento de meus dados pessoais e geolocalização conforme Lei
+                        13.709/2018 (LGPD).
                       </FormLabel>
                       <FormMessage />
                     </div>

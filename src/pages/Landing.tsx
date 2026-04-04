@@ -82,8 +82,10 @@ function Hero() {
       </div>
       <div className="container mx-auto px-4 relative z-20 flex flex-col items-center text-center">
         <div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-800 mb-8 animate-fade-in-up">
-          <span className="flex h-2 w-2 rounded-full bg-blue-600 mr-2 animate-pulse"></span>
-          Plataforma Nº1 em Segurança Patrimonial
+          <span className="flex h-2 w-2 rounded-full bg-blue-600 mr-2 animate-pulse"></span>A forma
+          mais inteligente de gerenciar
+          <br />
+          &nbsp;eventos e contratar freelancers em um só lugar.
         </div>
         <h1
           className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-blue-950 tracking-tight max-w-5xl mb-6 animate-fade-in-up"

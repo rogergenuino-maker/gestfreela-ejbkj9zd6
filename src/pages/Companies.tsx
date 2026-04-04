@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { ArrowLeft, Building2, Loader2, ImagePlus } from 'lucide-react'
+import { ArrowLeft, Building2, Loader2, ImagePlus, Plus, MapPin, Phone, Mail } from 'lucide-react'
 
 import { useAuth } from '@/hooks/use-auth'
 import { supabase } from '@/lib/supabase/client'
@@ -36,6 +36,16 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
+type Empresa = {
+  id: string
+  nome_empresa: string
+  cnpj: string | null
+  email: string | null
+  telefone: string | null
+  endereco: string | null
+  logo: string | null
+}
+
 const formatCNPJ = (value: string) => {
   return value
     .replace(/\D/g, '')
@@ -57,6 +67,10 @@ const formatPhone = (value: string) => {
 export default function Companies() {
   const { user } = useAuth()
   const { toast } = useToast()
+
+  const [view, setView] = useState<'list' | 'form'>('list')
+  const [empresas, setEmpresas] = useState<Empresa[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
 
@@ -73,6 +87,33 @@ export default function Companies() {
     },
   })
 
+  useEffect(() => {
+    if (user && view === 'list') {
+      fetchEmpresas()
+    }
+  }, [user, view])
+
+  const fetchEmpresas = async () => {
+    setIsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('empresas')
+        .select('id, nome_empresa, cnpj, email, telefone, endereco, logo')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setEmpresas(data || [])
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao carregar empresas',
+        description: error.message,
+        variant: 'destructive',
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -83,19 +124,11 @@ export default function Companies() {
   }
 
   const onSubmit = async (data: FormValues) => {
-    if (!user) {
-      toast({
-        title: 'Não autenticado',
-        description: 'Você precisa estar logado para realizar esta ação.',
-        variant: 'destructive',
-      })
-      return
-    }
+    if (!user) return
 
     setIsSubmitting(true)
 
     try {
-      // Simulação de upload: usando uma imagem genérica já que não temos storage configurado explicitamente
       const logoUrl = data.logo ? 'https://img.usecurling.com/i?q=company+logo&color=blue' : null
 
       const { error } = await supabase.from('empresas').insert({
@@ -118,6 +151,7 @@ export default function Companies() {
 
       form.reset()
       setLogoPreview(null)
+      setView('list')
     } catch (error: any) {
       toast({
         title: 'Erro ao cadastrar',
@@ -129,20 +163,125 @@ export default function Companies() {
     }
   }
 
+  if (view === 'list') {
+    return (
+      <div className="max-w-6xl mx-auto space-y-6 pb-10 animate-in fade-in duration-500">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Empresas</h1>
+            <p className="text-muted-foreground mt-1">
+              Gerencie as empresas cadastradas no sistema.
+            </p>
+          </div>
+          <Button
+            onClick={() => setView('form')}
+            className="bg-blue-600 hover:bg-blue-700 w-fit shrink-0"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Empresa
+          </Button>
+        </div>
+
+        {isLoading ? (
+          <div className="flex items-center justify-center p-12">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          </div>
+        ) : empresas.length === 0 ? (
+          <Card className="border-dashed shadow-none">
+            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                <Building2 className="h-8 w-8 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-medium text-slate-900">Nenhuma empresa encontrada</h3>
+              <p className="text-sm text-muted-foreground mt-2 max-w-sm mb-6">
+                Você ainda não tem nenhuma empresa cadastrada. Clique no botão abaixo para adicionar
+                a primeira.
+              </p>
+              <Button
+                onClick={() => setView('form')}
+                variant="outline"
+                className="border-blue-200 text-blue-700 hover:bg-blue-50"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Cadastrar Empresa
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {empresas.map((empresa) => (
+              <Card key={empresa.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="p-0 border-b bg-slate-50/50">
+                  <div className="p-6 flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-lg border bg-white flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                      {empresa.logo ? (
+                        <img
+                          src={empresa.logo}
+                          alt={empresa.nome_empresa}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <Building2 className="h-7 w-7 text-slate-300" />
+                      )}
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg text-slate-900 line-clamp-1">
+                        {empresa.nome_empresa}
+                      </CardTitle>
+                      <CardDescription className="text-xs mt-1 font-mono bg-slate-100 w-fit px-2 py-0.5 rounded text-slate-600">
+                        {empresa.cnpj || 'CNPJ não informado'}
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-3 text-sm">
+                    {empresa.email && (
+                      <div className="flex items-center gap-3 text-slate-600 group">
+                        <div className="p-1.5 rounded-md bg-blue-50 text-blue-600 group-hover:bg-blue-100 transition-colors">
+                          <Mail className="h-3.5 w-3.5" />
+                        </div>
+                        <span className="truncate">{empresa.email}</span>
+                      </div>
+                    )}
+                    {empresa.telefone && (
+                      <div className="flex items-center gap-3 text-slate-600 group">
+                        <div className="p-1.5 rounded-md bg-blue-50 text-blue-600 group-hover:bg-blue-100 transition-colors">
+                          <Phone className="h-3.5 w-3.5" />
+                        </div>
+                        <span>{empresa.telefone}</span>
+                      </div>
+                    )}
+                    {empresa.endereco && (
+                      <div className="flex items-center gap-3 text-slate-600 group">
+                        <div className="p-1.5 rounded-md bg-blue-50 text-blue-600 group-hover:bg-blue-100 transition-colors">
+                          <MapPin className="h-3.5 w-3.5" />
+                        </div>
+                        <span className="truncate">{empresa.endereco}</span>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Cadastro de Empresas</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Cadastro de Empresa</h1>
           <p className="text-muted-foreground mt-1">
-            Preencha os dados abaixo para registrar uma nova empresa parceira.
+            Preencha os dados abaixo para registrar uma nova empresa parceira no sistema.
           </p>
         </div>
-        <Button variant="outline" asChild className="shrink-0 w-fit">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Voltar
-          </Link>
+        <Button variant="outline" onClick={() => setView('list')} className="shrink-0 w-fit">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Voltar para a lista
         </Button>
       </div>
 

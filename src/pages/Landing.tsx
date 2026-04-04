@@ -325,7 +325,7 @@ function Footer() {
       </div>
       <div className="container mx-auto px-4 pt-8 border-t border-blue-50 flex flex-col md:flex-row items-center justify-between text-blue-900/40 text-sm">
         <p>&copy; {new Date().getFullYear()} ContratosFreela. Todos os direitos reservados.</p>
-        <p className="mt-2 md:mt-0">Desenvolvido para Segurança Patrimonial.</p>
+        <p className="mt-2 md:mt-0">Desenvolvido para Gerenciar Eventos e Serviços.</p>
       </div>
     </footer>
   )

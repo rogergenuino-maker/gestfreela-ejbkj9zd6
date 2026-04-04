@@ -9,56 +9,38 @@ export type Database = {
   }
   public: {
     Tables: {
-      companies: {
+      contratos: {
         Row: {
           created_at: string
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      contracts: {
-        Row: {
-          company_id: string | null
-          created_at: string
+          empresa_id: string | null
           freelancer_id: string | null
           id: string
           status: string
         }
         Insert: {
-          company_id?: string | null
           created_at?: string
+          empresa_id?: string | null
           freelancer_id?: string | null
           id?: string
           status?: string
         }
         Update: {
-          company_id?: string | null
           created_at?: string
+          empresa_id?: string | null
           freelancer_id?: string | null
           id?: string
           status?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'contracts_company_id_fkey'
-            columns: ['company_id']
+            foreignKeyName: 'contratos_empresa_id_fkey'
+            columns: ['empresa_id']
             isOneToOne: false
-            referencedRelation: 'companies'
+            referencedRelation: 'empresas'
             referencedColumns: ['id']
           },
           {
-            foreignKeyName: 'contracts_freelancer_id_fkey'
+            foreignKeyName: 'contratos_freelancer_id_fkey'
             columns: ['freelancer_id']
             isOneToOne: false
             referencedRelation: 'freelancers'
@@ -66,24 +48,127 @@ export type Database = {
           },
         ]
       }
+      empresas: {
+        Row: {
+          cnpj: string | null
+          created_at: string
+          descricao: string | null
+          email: string | null
+          endereco: string | null
+          id: string
+          logo: string | null
+          nome_empresa: string
+          telefone: string | null
+          user_id: string | null
+        }
+        Insert: {
+          cnpj?: string | null
+          created_at?: string
+          descricao?: string | null
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          logo?: string | null
+          nome_empresa: string
+          telefone?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          cnpj?: string | null
+          created_at?: string
+          descricao?: string | null
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          logo?: string | null
+          nome_empresa?: string
+          telefone?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'empresas_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       freelancers: {
         Row: {
+          cpf: string | null
           created_at: string
+          descricao: string | null
+          email: string | null
+          experiencia_anos: number | null
+          formacao: string | null
+          foto_perfil: string | null
           id: string
-          name: string
-          specialty: string | null
+          nome_completo: string
+          taxa_diaria: number | null
+          taxa_hora: number | null
+          telefone: string | null
+          user_id: string | null
+        }
+        Insert: {
+          cpf?: string | null
+          created_at?: string
+          descricao?: string | null
+          email?: string | null
+          experiencia_anos?: number | null
+          formacao?: string | null
+          foto_perfil?: string | null
+          id?: string
+          nome_completo: string
+          taxa_diaria?: number | null
+          taxa_hora?: number | null
+          telefone?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          cpf?: string | null
+          created_at?: string
+          descricao?: string | null
+          email?: string | null
+          experiencia_anos?: number | null
+          formacao?: string | null
+          foto_perfil?: string | null
+          id?: string
+          nome_completo?: string
+          taxa_diaria?: number | null
+          taxa_hora?: number | null
+          telefone?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'freelancers_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      users: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          user_type: string
         }
         Insert: {
           created_at?: string
-          id?: string
-          name: string
-          specialty?: string | null
+          email: string
+          id: string
+          user_type: string
         }
         Update: {
           created_at?: string
+          email?: string
           id?: string
-          name?: string
-          specialty?: string | null
+          user_type?: string
         }
         Relationships: []
       }
@@ -234,47 +319,94 @@ export const Constants = {
 // --- COLUMN TYPES (actual PostgreSQL types) ---
 // Use this to know the real database type when writing migrations.
 // "string" in TypeScript types above may be uuid, text, varchar, timestamptz, etc.
-// Table: companies
+// Table: contratos
 //   id: uuid (not null, default: gen_random_uuid())
-//   name: text (not null)
-//   created_at: timestamp with time zone (not null, default: now())
-// Table: contracts
-//   id: uuid (not null, default: gen_random_uuid())
-//   company_id: uuid (nullable)
+//   empresa_id: uuid (nullable)
 //   freelancer_id: uuid (nullable)
-//   status: text (not null, default: 'active'::text)
+//   status: text (not null, default: 'ativo'::text)
+//   created_at: timestamp with time zone (not null, default: now())
+// Table: empresas
+//   id: uuid (not null, default: gen_random_uuid())
+//   user_id: uuid (nullable)
+//   nome_empresa: text (not null)
+//   cnpj: text (nullable)
+//   descricao: text (nullable)
+//   telefone: text (nullable)
+//   email: text (nullable)
+//   endereco: text (nullable)
+//   logo: text (nullable)
 //   created_at: timestamp with time zone (not null, default: now())
 // Table: freelancers
 //   id: uuid (not null, default: gen_random_uuid())
-//   name: text (not null)
-//   specialty: text (nullable)
+//   user_id: uuid (nullable)
+//   nome_completo: text (not null)
+//   cpf: text (nullable)
+//   formacao: text (nullable)
+//   experiencia_anos: integer (nullable)
+//   descricao: text (nullable)
+//   telefone: text (nullable)
+//   email: text (nullable)
+//   foto_perfil: text (nullable)
+//   taxa_hora: numeric (nullable)
+//   taxa_diaria: numeric (nullable)
+//   created_at: timestamp with time zone (not null, default: now())
+// Table: users
+//   id: uuid (not null)
+//   email: text (not null)
+//   user_type: text (not null)
 //   created_at: timestamp with time zone (not null, default: now())
 
 // --- CONSTRAINTS ---
-// Table: companies
-//   PRIMARY KEY companies_pkey: PRIMARY KEY (id)
-// Table: contracts
-//   FOREIGN KEY contracts_company_id_fkey: FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-//   FOREIGN KEY contracts_freelancer_id_fkey: FOREIGN KEY (freelancer_id) REFERENCES freelancers(id) ON DELETE CASCADE
-//   PRIMARY KEY contracts_pkey: PRIMARY KEY (id)
+// Table: contratos
+//   FOREIGN KEY contratos_empresa_id_fkey: FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
+//   FOREIGN KEY contratos_freelancer_id_fkey: FOREIGN KEY (freelancer_id) REFERENCES freelancers(id) ON DELETE CASCADE
+//   PRIMARY KEY contratos_pkey: PRIMARY KEY (id)
+// Table: empresas
+//   PRIMARY KEY empresas_pkey: PRIMARY KEY (id)
+//   FOREIGN KEY empresas_user_id_fkey: FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 // Table: freelancers
 //   PRIMARY KEY freelancers_pkey: PRIMARY KEY (id)
+//   FOREIGN KEY freelancers_user_id_fkey: FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+// Table: users
+//   FOREIGN KEY users_id_fkey: FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
+//   PRIMARY KEY users_pkey: PRIMARY KEY (id)
 
 // --- ROW LEVEL SECURITY POLICIES ---
-// Table: companies
-//   Policy "auth_all_companies" (ALL, PERMISSIVE) roles={authenticated}
+// Table: contratos
+//   Policy "auth_all_contratos" (ALL, PERMISSIVE) roles={authenticated}
 //     USING: true
 //     WITH CHECK: true
-// Table: contracts
-//   Policy "auth_all_contracts" (ALL, PERMISSIVE) roles={authenticated}
+// Table: empresas
+//   Policy "auth_all_empresas" (ALL, PERMISSIVE) roles={authenticated}
 //     USING: true
 //     WITH CHECK: true
 // Table: freelancers
 //   Policy "auth_all_freelancers" (ALL, PERMISSIVE) roles={authenticated}
 //     USING: true
 //     WITH CHECK: true
+// Table: users
+//   Policy "auth_all_users" (ALL, PERMISSIVE) roles={authenticated}
+//     USING: true
+//     WITH CHECK: true
 
 // --- DATABASE FUNCTIONS ---
+// FUNCTION handle_new_user()
+//   CREATE OR REPLACE FUNCTION public.handle_new_user()
+//    RETURNS trigger
+//    LANGUAGE plpgsql
+//    SECURITY DEFINER
+//   AS $function$
+//   BEGIN
+//     INSERT INTO public.users (id, email, user_type)
+//     VALUES (
+//       NEW.id,
+//       NEW.email,
+//       COALESCE(NEW.raw_user_meta_data->>'user_type', 'freelancer')
+//     );
+//     RETURN NEW;
+//   END;
+//   $function$
+//
 // FUNCTION rls_auto_enable()
 //   CREATE OR REPLACE FUNCTION public.rls_auto_enable()
 //    RETURNS event_trigger

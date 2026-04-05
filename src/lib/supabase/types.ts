@@ -209,6 +209,44 @@ export type Database = {
           },
         ]
       }
+      denuncias: {
+        Row: {
+          contrato_id: string | null
+          data_denuncia: string
+          denunciante_id: string | null
+          descricao: string
+          evidencias_url: string | null
+          id: string
+          tipo_denuncia: string
+        }
+        Insert: {
+          contrato_id?: string | null
+          data_denuncia?: string
+          denunciante_id?: string | null
+          descricao: string
+          evidencias_url?: string | null
+          id?: string
+          tipo_denuncia: string
+        }
+        Update: {
+          contrato_id?: string | null
+          data_denuncia?: string
+          denunciante_id?: string | null
+          descricao?: string
+          evidencias_url?: string | null
+          id?: string
+          tipo_denuncia?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'denuncias_contrato_id_fkey'
+            columns: ['contrato_id']
+            isOneToOne: false
+            referencedRelation: 'contratos'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       documentos_validacao: {
         Row: {
           arquivo_url: string | null
@@ -668,6 +706,14 @@ export const Constants = {
 //   data_assinatura: timestamp with time zone (nullable)
 //   penalidade_aplicada: boolean (nullable, default: false)
 //   valor_estornado: numeric (nullable, default: 0)
+// Table: denuncias
+//   id: uuid (not null, default: gen_random_uuid())
+//   contrato_id: uuid (nullable)
+//   denunciante_id: uuid (nullable)
+//   tipo_denuncia: text (not null)
+//   descricao: text (not null)
+//   evidencias_url: text (nullable)
+//   data_denuncia: timestamp with time zone (not null, default: now())
 // Table: documentos_validacao
 //   id: uuid (not null, default: gen_random_uuid())
 //   freelancer_id: uuid (nullable)
@@ -751,6 +797,10 @@ export const Constants = {
 //   FOREIGN KEY contratos_freelancer_id_fkey: FOREIGN KEY (freelancer_id) REFERENCES freelancers(id) ON DELETE CASCADE
 //   PRIMARY KEY contratos_pkey: PRIMARY KEY (id)
 //   FOREIGN KEY contratos_vaga_id_fkey: FOREIGN KEY (vaga_id) REFERENCES vagas(id) ON DELETE SET NULL
+// Table: denuncias
+//   FOREIGN KEY denuncias_contrato_id_fkey: FOREIGN KEY (contrato_id) REFERENCES contratos(id) ON DELETE CASCADE
+//   FOREIGN KEY denuncias_denunciante_id_fkey: FOREIGN KEY (denunciante_id) REFERENCES auth.users(id) ON DELETE CASCADE
+//   PRIMARY KEY denuncias_pkey: PRIMARY KEY (id)
 // Table: documentos_validacao
 //   FOREIGN KEY documentos_validacao_freelancer_id_fkey: FOREIGN KEY (freelancer_id) REFERENCES freelancers(id) ON DELETE CASCADE
 //   PRIMARY KEY documentos_validacao_pkey: PRIMARY KEY (id)
@@ -801,6 +851,11 @@ export const Constants = {
 //     USING: ((empresa_id IN ( SELECT empresas.id    FROM empresas   WHERE (empresas.user_id = auth.uid()))) OR (freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
 //   Policy "contratos_update" (UPDATE, PERMISSIVE) roles={authenticated}
 //     USING: ((empresa_id IN ( SELECT empresas.id    FROM empresas   WHERE (empresas.user_id = auth.uid()))) OR (freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
+// Table: denuncias
+//   Policy "denuncias_insert" (INSERT, PERMISSIVE) roles={authenticated}
+//     WITH CHECK: (denunciante_id = auth.uid())
+//   Policy "denuncias_select" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: ((denunciante_id = auth.uid()) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
 // Table: documentos_validacao
 //   Policy "docs_delete" (DELETE, PERMISSIVE) roles={authenticated}
 //     USING: ((freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))

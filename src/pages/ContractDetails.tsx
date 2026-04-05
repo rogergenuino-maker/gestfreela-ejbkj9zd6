@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { exportContractPDF } from '@/utils/pdfExport'
+import { exportContractPDF, generateCancelamentoHTML } from '@/utils/pdfExport'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { useToast } from '@/hooks/use-toast'
-import { getContratoById, cancelarContrato } from '@/services/contratos'
+import { getContratoById, cancelarContrato, uploadTermoCancelamento } from '@/services/contratos'
 import { useAuth } from '@/hooks/use-auth'
 import {
   Dialog,
@@ -61,6 +61,7 @@ export default function ContractDetails() {
   const [loading, setLoading] = useState(true)
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [canceling, setCanceling] = useState(false)
+  const [motivoCancelamento, setMotivoCancelamento] = useState('')
 
   const [showDenunciaDialog, setShowDenunciaDialog] = useState(false)
   const [tipoDenuncia, setTipoDenuncia] = useState('')
@@ -101,9 +102,45 @@ export default function ContractDetails() {
   const valorRemuneracao = vaga?.valor_remuneracao || 0
 
   const handleCancel = async () => {
+    if (!motivoCancelamento.trim()) {
+      toast({
+        title: 'Aviso',
+        description: 'Por favor, informe o motivo do cancelamento.',
+        variant: 'destructive',
+      })
+      return
+    }
+
     setCanceling(true)
     const valorEstornado = isPenalty ? valorRemuneracao * 0.9 : valorRemuneracao
-    const { error } = await cancelarContrato(id!, isPenalty, valorEstornado)
+
+    const htmlContent = generateCancelamentoHTML(
+      contrato,
+      motivoCancelamento,
+      isPenalty,
+      valorEstornado,
+      formatCurrency,
+    )
+
+    const { url, error: uploadError } = await uploadTermoCancelamento(id!, htmlContent)
+
+    if (uploadError) {
+      toast({
+        title: 'Erro',
+        description: 'Erro ao gerar documento de cancelamento.',
+        variant: 'destructive',
+      })
+      setCanceling(false)
+      return
+    }
+
+    const { error } = await cancelarContrato(
+      id!,
+      isPenalty,
+      valorEstornado,
+      motivoCancelamento,
+      url || '',
+    )
 
     setCanceling(false)
     setShowCancelDialog(false)
@@ -119,7 +156,7 @@ export default function ContractDetails() {
 
     toast({
       title: 'Contrato Cancelado',
-      description: 'Notificação push disparada para o Freelancer com sucesso.',
+      description: 'Contrato cancelado e termo gerado com sucesso.',
     })
 
     setContrato({
@@ -127,6 +164,8 @@ export default function ContractDetails() {
       status: 'cancelado',
       penalidade_aplicada: isPenalty,
       valor_estornado: valorEstornado,
+      motivo_cancelamento: motivoCancelamento,
+      url_termo_cancelamento: url,
     })
   }
 
@@ -352,6 +391,18 @@ export default function ContractDetails() {
                       {formatCurrency(contrato.valor_estornado || 0)}
                     </span>
                   </div>
+                  {contrato.url_termo_cancelamento && (
+                    <div className="pt-3">
+                      <Button
+                        variant="outline"
+                        className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => window.open(contrato.url_termo_cancelamento, '_blank')}
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Baixar Termo de Cancelamento
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -429,6 +480,20 @@ export default function ContractDetails() {
                   </div>
                 </>
               )}
+
+              <div className="mt-4 space-y-2 text-left">
+                <Label htmlFor="motivo">
+                  Motivo do Cancelamento <span className="text-red-500">*</span>
+                </Label>
+                <Textarea
+                  id="motivo"
+                  value={motivoCancelamento}
+                  onChange={(e) => setMotivoCancelamento(e.target.value)}
+                  placeholder="Descreva brevemente o motivo do cancelamento..."
+                  className="resize-none"
+                  rows={3}
+                />
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6">

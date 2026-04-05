@@ -21,6 +21,8 @@ import Contracts from './pages/Contracts'
 import DocumentsAdmin from './pages/DocumentsAdmin'
 import ContractDetails from './pages/ContractDetails'
 import CheckinOperacional from './pages/CheckinOperacional'
+import AvaliacaoServico from './pages/AvaliacaoServico'
+import RankingFreelancers from './pages/RankingFreelancers'
 import MapaPresenca from './pages/MapaPresenca'
 import RelatorioHoras from './pages/RelatorioHoras'
 import NotFound from './pages/NotFound'
@@ -49,7 +51,9 @@ const App = () => (
               <Route path="/contratos/:id" element={<ContractDetails />} />
               <Route path="/contratos/:id/assinar" element={<AssinaturaContrato />} />
               <Route path="/contratos/:id/checkin" element={<CheckinOperacional />} />
+              <Route path="/contratos/:id/avaliar" element={<AvaliacaoServico />} />
               <Route path="/contracts" element={<Contracts />} />
+              <Route path="/ranking-freelancers" element={<RankingFreelancers />} />
               <Route path="/mapa-presenca" element={<MapaPresenca />} />
               <Route path="/relatorio-horas" element={<RelatorioHoras />} />
               <Route path="/admin/documents" element={<DocumentsAdmin />} />

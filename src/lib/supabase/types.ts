@@ -732,7 +732,7 @@ export const Constants = {
 //   Policy "contratos_delete" (DELETE, PERMISSIVE) roles={authenticated}
 //     USING: ((empresa_id IN ( SELECT empresas.id    FROM empresas   WHERE (empresas.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
 //   Policy "contratos_insert" (INSERT, PERMISSIVE) roles={authenticated}
-//     WITH CHECK: ((empresa_id IN ( SELECT empresas.id    FROM empresas   WHERE (empresas.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
+//     WITH CHECK: ((empresa_id IN ( SELECT empresas.id    FROM empresas   WHERE (empresas.user_id = auth.uid()))) OR (freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
 //   Policy "contratos_select" (SELECT, PERMISSIVE) roles={authenticated}
 //     USING: ((empresa_id IN ( SELECT empresas.id    FROM empresas   WHERE (empresas.user_id = auth.uid()))) OR (freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
 //   Policy "contratos_update" (UPDATE, PERMISSIVE) roles={authenticated}

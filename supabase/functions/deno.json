@@ -4,6 +4,7 @@
     "monitor-atrasos": 1,
     "notificar-denuncia": 1,
     "process-profile-picture": 1,
-    "send-email": 1
+    "send-email": 1,
+    "calcular-pagamento": 1
   }
 }

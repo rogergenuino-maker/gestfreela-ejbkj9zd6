@@ -436,6 +436,33 @@ export type Database = {
           },
         ]
       }
+      mensagens: {
+        Row: {
+          conteudo: string
+          data_envio: string
+          destinatario_id: string
+          id: string
+          lido: boolean
+          remetente_id: string
+        }
+        Insert: {
+          conteudo: string
+          data_envio?: string
+          destinatario_id: string
+          id?: string
+          lido?: boolean
+          remetente_id: string
+        }
+        Update: {
+          conteudo?: string
+          data_envio?: string
+          destinatario_id?: string
+          id?: string
+          lido?: boolean
+          remetente_id?: string
+        }
+        Relationships: []
+      }
       perfis: {
         Row: {
           created_at: string | null
@@ -765,6 +792,13 @@ export const Constants = {
 //   contrato_id: uuid (nullable)
 //   ip_dispositivo: text (nullable)
 //   data_hora_aceite: timestamp with time zone (nullable, default: now())
+// Table: mensagens
+//   id: uuid (not null, default: gen_random_uuid())
+//   remetente_id: uuid (not null)
+//   destinatario_id: uuid (not null)
+//   conteudo: text (not null)
+//   lido: boolean (not null, default: false)
+//   data_envio: timestamp with time zone (not null, default: now())
 // Table: perfis
 //   id: uuid (not null)
 //   lgpd_aceito: boolean (nullable, default: false)
@@ -826,6 +860,10 @@ export const Constants = {
 //   FOREIGN KEY logs_aceite_digital_contrato_id_fkey: FOREIGN KEY (contrato_id) REFERENCES contratos(id) ON DELETE CASCADE
 //   FOREIGN KEY logs_aceite_digital_freelancer_id_fkey: FOREIGN KEY (freelancer_id) REFERENCES freelancers(id) ON DELETE CASCADE
 //   PRIMARY KEY logs_aceite_digital_pkey: PRIMARY KEY (id)
+// Table: mensagens
+//   FOREIGN KEY mensagens_destinatario_id_fkey: FOREIGN KEY (destinatario_id) REFERENCES auth.users(id) ON DELETE CASCADE
+//   PRIMARY KEY mensagens_pkey: PRIMARY KEY (id)
+//   FOREIGN KEY mensagens_remetente_id_fkey: FOREIGN KEY (remetente_id) REFERENCES auth.users(id) ON DELETE CASCADE
 // Table: perfis
 //   FOREIGN KEY perfis_id_fkey: FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
 //   PRIMARY KEY perfis_pkey: PRIMARY KEY (id)
@@ -905,6 +943,14 @@ export const Constants = {
 //     WITH CHECK: ((freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
 //   Policy "logs_select" (SELECT, PERMISSIVE) roles={authenticated}
 //     USING: ((freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (contrato_id IN ( SELECT contratos.id    FROM contratos   WHERE (contratos.empresa_id IN ( SELECT empresas.id            FROM empresas           WHERE (empresas.user_id = auth.uid()))))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
+// Table: mensagens
+//   Policy "mensagens_insert" (INSERT, PERMISSIVE) roles={authenticated}
+//     WITH CHECK: (auth.uid() = remetente_id)
+//   Policy "mensagens_select" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: ((auth.uid() = remetente_id) OR (auth.uid() = destinatario_id))
+//   Policy "mensagens_update" (UPDATE, PERMISSIVE) roles={authenticated}
+//     USING: (auth.uid() = destinatario_id)
+//     WITH CHECK: (auth.uid() = destinatario_id)
 // Table: perfis
 //   Policy "perfis_insert" (INSERT, PERMISSIVE) roles={authenticated}
 //     WITH CHECK: (id = auth.uid())

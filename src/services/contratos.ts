@@ -1,10 +1,14 @@
 import { supabase } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/types'
+import { sendEmailNotification } from './email'
 
 type ContratoInsert = Database['public']['Tables']['contratos']['Insert']
 
 export const createContrato = async (contrato: ContratoInsert) => {
   const { data, error } = await supabase.from('contratos').insert(contrato).select().single()
+  if (data && !error) {
+    sendEmailNotification('contrato_criado', { contratoId: data.id })
+  }
   return { data, error }
 }
 
@@ -62,6 +66,11 @@ export const cancelarContrato = async (
     .eq('id', id)
     .select()
     .single()
+
+  if (data && !error) {
+    sendEmailNotification('contrato_cancelado', { contratoId: id })
+  }
+
   return { data, error }
 }
 

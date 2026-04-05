@@ -1,10 +1,14 @@
 import { supabase } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/types'
+import { sendEmailNotification } from './email'
 
 type VagaInsert = Database['public']['Tables']['vagas']['Insert']
 
 export const createVaga = async (vaga: VagaInsert) => {
   const { data, error } = await supabase.from('vagas').insert(vaga).select().single()
+  if (data && !error) {
+    sendEmailNotification('vaga_publicada', { vagaId: data.id })
+  }
   return { data, error }
 }
 

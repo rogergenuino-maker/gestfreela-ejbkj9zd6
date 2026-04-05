@@ -20,6 +20,7 @@ import AssinaturaContrato from './pages/AssinaturaContrato'
 import Contracts from './pages/Contracts'
 import DocumentsAdmin from './pages/DocumentsAdmin'
 import ContractDetails from './pages/ContractDetails'
+import CheckinOperacional from './pages/CheckinOperacional'
 import NotFound from './pages/NotFound'
 
 const App = () => (
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/vagas/:id" element={<VagaDetails />} />
               <Route path="/contratos/:id" element={<ContractDetails />} />
               <Route path="/contratos/:id/assinar" element={<AssinaturaContrato />} />
+              <Route path="/contratos/:id/checkin" element={<CheckinOperacional />} />
               <Route path="/contracts" element={<Contracts />} />
               <Route path="/admin/documents" element={<DocumentsAdmin />} />
             </Route>

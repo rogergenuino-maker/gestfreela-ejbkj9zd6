@@ -42,3 +42,21 @@ export const assinarContrato = async (id: string, logData: any) => {
 
   return { data: contrato, error: null }
 }
+
+export const cancelarContrato = async (
+  id: string,
+  penalidadeAplicada: boolean,
+  valorEstornado: number,
+) => {
+  const { data, error } = await supabase
+    .from('contratos')
+    .update({
+      status: 'cancelado',
+      penalidade_aplicada: penalidadeAplicada,
+      valor_estornado: valorEstornado,
+    })
+    .eq('id', id)
+    .select()
+    .single()
+  return { data, error }
+}

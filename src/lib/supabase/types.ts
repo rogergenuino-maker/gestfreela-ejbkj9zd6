@@ -844,3 +844,21 @@ export const Constants = {
 //   END;
 //   $function$
 //
+// FUNCTION update_vaga_on_contrato_signed()
+//   CREATE OR REPLACE FUNCTION public.update_vaga_on_contrato_signed()
+//    RETURNS trigger
+//    LANGUAGE plpgsql
+//    SECURITY DEFINER
+//   AS $function$
+//     BEGIN
+//       IF NEW.status = 'ativo' AND OLD.status != 'ativo' THEN
+//         UPDATE public.vagas SET status = 'preenchida' WHERE id = NEW.vaga_id;
+//       END IF;
+//       RETURN NEW;
+//     END;
+//     $function$
+//
+
+// --- TRIGGERS ---
+// Table: contratos
+//   on_contrato_signed: CREATE TRIGGER on_contrato_signed AFTER UPDATE ON public.contratos FOR EACH ROW EXECUTE FUNCTION update_vaga_on_contrato_signed()

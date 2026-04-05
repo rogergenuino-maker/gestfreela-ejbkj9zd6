@@ -25,6 +25,7 @@ import AvaliacaoServico from './pages/AvaliacaoServico'
 import RankingFreelancers from './pages/RankingFreelancers'
 import MapaPresenca from './pages/MapaPresenca'
 import RelatorioHoras from './pages/RelatorioHoras'
+import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 
 const App = () => (
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/contratos/:id" element={<ContractDetails />} />
               <Route path="/contratos/:id/assinar" element={<AssinaturaContrato />} />
               <Route path="/contratos/:id/avaliar" element={<AvaliacaoServico />} />
+              <Route path="/profile" element={<Profile />} />
 
               <Route element={<ProtectedRoute allowedRoles={['empresa']} />}>
                 <Route path="/companies" element={<Companies />} />

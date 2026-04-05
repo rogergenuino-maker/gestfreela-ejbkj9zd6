@@ -62,6 +62,7 @@ export default function ContractDetails() {
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [canceling, setCanceling] = useState(false)
   const [motivoCancelamento, setMotivoCancelamento] = useState('')
+  const [confirmacaoCancelamento, setConfirmacaoCancelamento] = useState('')
 
   const [showDenunciaDialog, setShowDenunciaDialog] = useState(false)
   const [tipoDenuncia, setTipoDenuncia] = useState('')
@@ -144,6 +145,7 @@ export default function ContractDetails() {
 
     setCanceling(false)
     setShowCancelDialog(false)
+    setConfirmacaoCancelamento('')
 
     if (error) {
       toast({
@@ -437,7 +439,13 @@ export default function ContractDetails() {
         </div>
       </div>
 
-      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+      <AlertDialog
+        open={showCancelDialog}
+        onOpenChange={(open) => {
+          setShowCancelDialog(open)
+          if (!open) setConfirmacaoCancelamento('')
+        }}
+      >
         <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-xl">
@@ -494,19 +502,37 @@ export default function ContractDetails() {
                   rows={3}
                 />
               </div>
+
+              <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-3 text-left">
+                <Label htmlFor="confirmacao-cancelamento" className="text-slate-700 font-medium">
+                  Para confirmar o cancelamento, digite{' '}
+                  <strong className="text-red-600">CONFIRMAR</strong> abaixo:
+                </Label>
+                <Input
+                  id="confirmacao-cancelamento"
+                  value={confirmacaoCancelamento}
+                  onChange={(e) => setConfirmacaoCancelamento(e.target.value)}
+                  placeholder="CONFIRMAR"
+                  className="border-slate-300 bg-white"
+                  autoComplete="off"
+                />
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6">
-            <AlertDialogCancel disabled={canceling} className="border-slate-200 text-slate-600">
-              Voltar
+            <AlertDialogCancel
+              disabled={canceling}
+              className="border-slate-200 text-slate-600 hover:bg-slate-100"
+            >
+              Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault()
                 handleCancel()
               }}
-              className="bg-red-600 hover:bg-red-700 text-white"
-              disabled={canceling}
+              className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={canceling || confirmacaoCancelamento !== 'CONFIRMAR'}
             >
               {canceling ? 'Cancelando...' : 'Confirmar Cancelamento'}
             </AlertDialogAction>

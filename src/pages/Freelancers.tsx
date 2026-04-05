@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select'
 import { supabase } from '@/lib/supabase/client'
 import { useToast } from '@/hooks/use-toast'
+import { DangerConfirmModal } from '@/components/ui/danger-confirm-modal'
 
 interface Freelancer {
   id: string
@@ -37,6 +38,8 @@ export default function Freelancers() {
   const [formacaoFilter, setFormacaoFilter] = useState('all')
   const [experienciaFilter, setExperienciaFilter] = useState('all')
   const [loading, setLoading] = useState(true)
+  const [freelancerToDelete, setFreelancerToDelete] = useState<Freelancer | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const { toast } = useToast()
 
   const fetchFreelancers = async () => {
@@ -58,15 +61,18 @@ export default function Freelancers() {
     fetchFreelancers()
   }, [])
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Deseja realmente excluir este freelancer?')) return
-    const { error } = await supabase.from('freelancers').delete().eq('id', id)
+  const executeDelete = async () => {
+    if (!freelancerToDelete) return
+    setIsDeleting(true)
+    const { error } = await supabase.from('freelancers').delete().eq('id', freelancerToDelete.id)
     if (error) {
       toast({ title: 'Erro', description: 'Erro ao excluir.', variant: 'destructive' })
     } else {
       toast({ title: 'Sucesso', description: 'Freelancer excluído com sucesso.' })
       fetchFreelancers()
     }
+    setIsDeleting(false)
+    setFreelancerToDelete(null)
   }
 
   const filtered = freelancers.filter((f) => {
@@ -221,7 +227,7 @@ export default function Freelancers() {
                             variant="ghost"
                             size="icon"
                             className="text-slate-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleDelete(freelancer.id)}
+                            onClick={() => setFreelancerToDelete(freelancer)}
                             title="Excluir"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -236,6 +242,16 @@ export default function Freelancers() {
           </div>
         </CardContent>
       </Card>
+
+      <DangerConfirmModal
+        open={!!freelancerToDelete}
+        onOpenChange={(open) => !open && setFreelancerToDelete(null)}
+        onConfirm={executeDelete}
+        title="Excluir Freelancer"
+        description="Esta ação não pode ser desfeita. Todos os dados deste freelancer serão removidos permanentemente do sistema."
+        itemName={freelancerToDelete?.nome_completo}
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

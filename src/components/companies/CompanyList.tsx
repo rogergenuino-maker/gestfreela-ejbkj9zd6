@@ -3,6 +3,7 @@ import { Plus, Search, Edit, Trash2, Building2, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
+import { DangerConfirmModal } from '@/components/ui/danger-confirm-modal'
 import {
   Table,
   TableBody,
@@ -29,6 +30,7 @@ export default function CompanyList({
   onDelete,
 }: CompanyListProps) {
   const [searchTerm, setSearchTerm] = useState('')
+  const [companyToDelete, setCompanyToDelete] = useState<Empresa | null>(null)
 
   const filteredEmpresas = empresas.filter((emp) => {
     const term = searchTerm.toLowerCase()
@@ -136,7 +138,7 @@ export default function CompanyList({
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => onDelete(emp.id)}
+                          onClick={() => setCompanyToDelete(emp)}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -150,6 +152,20 @@ export default function CompanyList({
           </div>
         </div>
       )}
+
+      <DangerConfirmModal
+        open={!!companyToDelete}
+        onOpenChange={(open) => !open && setCompanyToDelete(null)}
+        onConfirm={() => {
+          if (companyToDelete) {
+            onDelete(companyToDelete.id)
+            setCompanyToDelete(null)
+          }
+        }}
+        title="Excluir Empresa"
+        description="Tem certeza que deseja excluir esta empresa? Esta ação não poderá ser desfeita e todos os dados associados serão removidos permanentemente."
+        itemName={companyToDelete?.nome_empresa}
+      />
     </div>
   )
 }

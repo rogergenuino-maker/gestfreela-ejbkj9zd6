@@ -465,18 +465,21 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          profile_picture_url: string | null
           user_type: string
         }
         Insert: {
           created_at?: string
           email: string
           id: string
+          profile_picture_url?: string | null
           user_type: string
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
+          profile_picture_url?: string | null
           user_type?: string
         }
         Relationships: []
@@ -773,6 +776,7 @@ export const Constants = {
 //   email: text (not null)
 //   user_type: text (not null)
 //   created_at: timestamp with time zone (not null, default: now())
+//   profile_picture_url: text (nullable)
 // Table: vagas
 //   id: uuid (not null, default: gen_random_uuid())
 //   empresa_id: uuid (nullable)

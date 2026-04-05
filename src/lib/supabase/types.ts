@@ -158,8 +158,10 @@ export type Database = {
           empresa_id: string | null
           freelancer_id: string | null
           id: string
+          motivo_cancelamento: string | null
           penalidade_aplicada: boolean | null
           status: string
+          url_termo_cancelamento: string | null
           vaga_id: string | null
           valor_estornado: number | null
         }
@@ -169,8 +171,10 @@ export type Database = {
           empresa_id?: string | null
           freelancer_id?: string | null
           id?: string
+          motivo_cancelamento?: string | null
           penalidade_aplicada?: boolean | null
           status?: string
+          url_termo_cancelamento?: string | null
           vaga_id?: string | null
           valor_estornado?: number | null
         }
@@ -180,8 +184,10 @@ export type Database = {
           empresa_id?: string | null
           freelancer_id?: string | null
           id?: string
+          motivo_cancelamento?: string | null
           penalidade_aplicada?: boolean | null
           status?: string
+          url_termo_cancelamento?: string | null
           vaga_id?: string | null
           valor_estornado?: number | null
         }
@@ -706,6 +712,8 @@ export const Constants = {
 //   data_assinatura: timestamp with time zone (nullable)
 //   penalidade_aplicada: boolean (nullable, default: false)
 //   valor_estornado: numeric (nullable, default: 0)
+//   motivo_cancelamento: text (nullable)
+//   url_termo_cancelamento: text (nullable)
 // Table: denuncias
 //   id: uuid (not null, default: gen_random_uuid())
 //   contrato_id: uuid (nullable)

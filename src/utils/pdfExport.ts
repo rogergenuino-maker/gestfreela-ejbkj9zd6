@@ -28,47 +28,47 @@ export const generateCancelamentoHTML = (
         }
       </style>
     </head>
-    <body class="bg-slate-100 text-slate-900 py-8 px-4 font-sans min-h-screen">
+    <body class="bg-blue-50 text-slate-900 py-8 px-4 font-sans min-h-screen">
       <div class="max-w-4xl mx-auto bg-white border border-slate-200 p-10 rounded-lg shadow-sm">
         <div class="no-print mb-6 flex justify-end">
           <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition-colors">
             Salvar como PDF
           </button>
         </div>
-        <div class="flex justify-between items-start border-b border-red-200 pb-6 mb-6">
+        <div class="flex justify-between items-start border-b border-blue-200 pb-6 mb-6">
           <div>
-            <h1 class="text-3xl font-bold text-red-700">Termo de Cancelamento de Contrato</h1>
+            <h1 class="text-3xl font-bold text-blue-700">Termo de Cancelamento de Contrato</h1>
             <p class="text-slate-500 mt-1">ID do Contrato: ${contrato.id}</p>
           </div>
           <div class="text-right">
-            <p class="font-semibold text-slate-700">Data do Cancelamento</p>
+            <p class="font-semibold text-slate-700">Data de Geração</p>
             <p class="text-slate-500">${dataCancelamento}</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-8 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div>
-            <h2 class="text-lg font-semibold text-red-800 border-b border-red-100 pb-2 mb-3">Dados da Empresa</h2>
+            <h2 class="text-lg font-semibold text-blue-800 border-b border-blue-100 pb-2 mb-3">Dados da Empresa</h2>
             <p class="mb-1"><strong>Razão Social:</strong> ${empresa?.nome_empresa || 'N/A'}</p>
             <p class="mb-1"><strong>CNPJ:</strong> ${empresa?.cnpj || 'N/A'}</p>
             <p class="mb-1"><strong>Email:</strong> ${empresa?.email || 'N/A'}</p>
           </div>
           <div>
-            <h2 class="text-lg font-semibold text-red-800 border-b border-red-100 pb-2 mb-3">Dados do Freelancer</h2>
+            <h2 class="text-lg font-semibold text-blue-800 border-b border-blue-100 pb-2 mb-3">Dados do Freelancer</h2>
             <p class="mb-1"><strong>Nome Completo:</strong> ${freelancer?.nome_completo || 'N/A'}</p>
             <p class="mb-1"><strong>CPF:</strong> ${freelancer?.cpf || 'N/A'}</p>
             <p class="mb-1"><strong>Email:</strong> ${freelancer?.email || 'N/A'}</p>
           </div>
         </div>
 
-        <div class="mb-8 p-4 bg-red-50 rounded-lg border border-red-100">
-          <h2 class="text-lg font-semibold text-red-800 mb-2">Motivo do Cancelamento</h2>
+        <div class="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <h2 class="text-lg font-semibold text-blue-800 mb-2">Motivo do Cancelamento</h2>
           <p class="text-slate-700">${motivo}</p>
         </div>
 
-        <div class="mb-8 grid grid-cols-2 gap-4">
+        <div class="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <h2 class="text-sm font-semibold text-slate-500 mb-1">Penalidade Aplicada</h2>
+            <h2 class="text-sm font-semibold text-slate-500 mb-1">Multa/Penalidade</h2>
             <p class="text-xl font-bold text-slate-900">${penaltyText}</p>
           </div>
           <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
@@ -77,11 +77,11 @@ export const generateCancelamentoHTML = (
           </div>
         </div>
 
-        <div class="mt-12 pt-8 border-t border-slate-200 flex items-center justify-between">
-          <div>
-            <h2 class="text-lg font-semibold text-slate-800 mb-2">Assinatura Digital de Cancelamento</h2>
+        <div class="mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div class="text-center sm:text-left">
+            <h2 class="text-lg font-semibold text-blue-800 mb-2">Assinatura Digital de Cancelamento</h2>
             <p class="text-sm text-slate-500 mb-1">Hash de Autenticidade:</p>
-            <p class="text-xs font-mono bg-slate-100 p-2 rounded text-slate-600 break-all w-64">${cancelHash}</p>
+            <p class="text-xs font-mono bg-slate-100 p-2 rounded text-slate-600 break-all max-w-[250px] mx-auto sm:mx-0">${cancelHash}</p>
           </div>
           <div class="text-center">
             <img src="${qrCodeUrl}" alt="QR Code" class="w-32 h-32 mx-auto border p-1 rounded bg-white" />

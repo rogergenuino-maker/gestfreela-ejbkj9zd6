@@ -395,7 +395,7 @@ export default function ContractDetails() {
                     <div className="pt-3">
                       <Button
                         variant="outline"
-                        className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                        className="w-full text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
                         onClick={() => window.open(contrato.url_termo_cancelamento, '_blank')}
                       >
                         <FileText className="w-4 h-4 mr-2" />

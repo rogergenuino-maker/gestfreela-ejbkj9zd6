@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Clock,
   LogOut,
+  MessageSquare,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -20,9 +21,12 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { useAuth } from '@/hooks/use-auth'
+import { useUnreadMessages } from '@/hooks/use-messages'
+import { Badge } from '@/components/ui/badge'
 
 const menuItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
+  { title: 'Mensagens', url: '/mensagens', icon: MessageSquare },
   { title: 'Cadastro de Empresas', url: '/companies', icon: Building2 },
   { title: 'Cadastro de Freelancers', url: '/freelancers', icon: Users },
   { title: 'Gestão de Contratos', url: '/contracts', icon: FileText },
@@ -33,6 +37,7 @@ const menuItems = [
 export function AppSidebar() {
   const location = useLocation()
   const { signOut } = useAuth()
+  const unreadCount = useUnreadMessages()
 
   return (
     <Sidebar>
@@ -48,9 +53,17 @@ export function AppSidebar() {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
-                      <Link to={item.url} className="flex items-center gap-3">
+                      <Link to={item.url} className="flex items-center gap-3 w-full">
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
+                        {item.title === 'Mensagens' && unreadCount > 0 && (
+                          <Badge
+                            variant="destructive"
+                            className="ml-auto flex h-5 w-5 items-center justify-center rounded-full p-0 text-[10px]"
+                          >
+                            {unreadCount}
+                          </Badge>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

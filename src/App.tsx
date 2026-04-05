@@ -20,6 +20,7 @@ import AssinaturaContrato from './pages/AssinaturaContrato'
 import Contracts from './pages/Contracts'
 import DocumentsAdmin from './pages/DocumentsAdmin'
 import ContractDetails from './pages/ContractDetails'
+import Messages from './pages/Messages'
 import CheckinOperacional from './pages/CheckinOperacional'
 import AvaliacaoServico from './pages/AvaliacaoServico'
 import RankingFreelancers from './pages/RankingFreelancers'
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/contratos/:id/assinar" element={<AssinaturaContrato />} />
               <Route path="/contratos/:id/avaliar" element={<AvaliacaoServico />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/mensagens" element={<Messages />} />
 
               <Route element={<ProtectedRoute allowedRoles={['empresa']} />}>
                 <Route path="/companies" element={<Companies />} />

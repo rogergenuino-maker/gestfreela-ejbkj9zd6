@@ -22,6 +22,7 @@ import DocumentsAdmin from './pages/DocumentsAdmin'
 import ContractDetails from './pages/ContractDetails'
 import CheckinOperacional from './pages/CheckinOperacional'
 import MapaPresenca from './pages/MapaPresenca'
+import RelatorioHoras from './pages/RelatorioHoras'
 import NotFound from './pages/NotFound'
 
 const App = () => (
@@ -50,6 +51,7 @@ const App = () => (
               <Route path="/contratos/:id/checkin" element={<CheckinOperacional />} />
               <Route path="/contracts" element={<Contracts />} />
               <Route path="/mapa-presenca" element={<MapaPresenca />} />
+              <Route path="/relatorio-horas" element={<RelatorioHoras />} />
               <Route path="/admin/documents" element={<DocumentsAdmin />} />
             </Route>
           </Route>

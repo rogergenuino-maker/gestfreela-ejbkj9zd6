@@ -1,5 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Building2, Users, FileText, ShieldCheck, LogOut } from 'lucide-react'
+import {
+  LayoutDashboard,
+  Building2,
+  Users,
+  FileText,
+  ShieldCheck,
+  Clock,
+  LogOut,
+} from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -19,6 +27,7 @@ const menuItems = [
   { title: 'Cadastro de Freelancers', url: '/freelancers', icon: Users },
   { title: 'Gestão de Contratos', url: '/contracts', icon: FileText },
   { title: 'Validação de Documentos', url: '/admin/documents', icon: ShieldCheck },
+  { title: 'Relatório de Horas', url: '/relatorio-horas', icon: Clock },
 ]
 
 export function AppSidebar() {

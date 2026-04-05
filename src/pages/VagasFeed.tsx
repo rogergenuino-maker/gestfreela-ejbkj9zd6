@@ -5,6 +5,23 @@ import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { useToast } from '@/hooks/use-toast'
 import {
   Briefcase,
   MapPin,
@@ -15,14 +32,27 @@ import {
   XCircle,
   Hourglass,
   FileText,
+  Filter,
+  Info,
 } from 'lucide-react'
 
 export default function VagasFeed() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [vagas, setVagas] = useState<any[]>([])
   const [documentos, setDocumentos] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [hasAccess, setHasAccess] = useState<boolean>(false)
+  const [freelancerId, setFreelancerId] = useState<string | null>(null)
+
+  // Filtros
+  const [filtroNatureza, setFiltroNatureza] = useState<string>('todas')
+  const [filtroValorMin, setFiltroValorMin] = useState<string>('')
+  const [filtroValorMax, setFiltroValorMax] = useState<string>('')
+
+  // Modal
+  const [vagaSelecionada, setVagaSelecionada] = useState<any>(null)
+  const [accepting, setAccepting] = useState(false)
 
   useEffect(() => {
     const loadVagas = async () => {
@@ -35,6 +65,7 @@ export default function VagasFeed() {
         .single()
 
       if (fData) {
+        setFreelancerId(fData.id)
         const { data: docs } = await supabase
           .from('documentos_validacao')
           .select('*')
@@ -70,6 +101,37 @@ export default function VagasFeed() {
 
     loadVagas()
   }, [user])
+
+  const handleAceitarVaga = async () => {
+    if (!vagaSelecionada) return
+
+    setAccepting(true)
+    try {
+      // Simulação do registro de interesse/aceite da vaga
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      toast({
+        title: 'Candidatura Enviada!',
+        description: 'A empresa foi notificada do seu interesse nesta vaga.',
+      })
+      setVagaSelecionada(null)
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível aceitar a vaga.',
+        variant: 'destructive',
+      })
+    } finally {
+      setAccepting(false)
+    }
+  }
+
+  const vagasFiltradas = vagas.filter((vaga) => {
+    if (filtroNatureza !== 'todas' && vaga.natureza !== filtroNatureza) return false
+    if (filtroValorMin && vaga.valor_remuneracao < Number(filtroValorMin)) return false
+    if (filtroValorMax && vaga.valor_remuneracao > Number(filtroValorMax)) return false
+    return true
+  })
 
   if (loading) {
     return (
@@ -179,9 +241,14 @@ export default function VagasFeed() {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
   }
 
-  const formatDate = (dateString: string) => {
+  const formatDateTime = (dateString: string) => {
     if (!dateString) return ''
-    return new Date(dateString).toLocaleDateString('pt-BR')
+    const d = new Date(dateString)
+    return (
+      d.toLocaleDateString('pt-BR') +
+      ' às ' +
+      d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    )
   }
 
   return (
@@ -198,23 +265,71 @@ export default function VagasFeed() {
         </div>
       </div>
 
-      {vagas.length === 0 ? (
-        <Card className="border-dashed border-2 bg-slate-50/50">
+      <div className="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div className="flex items-center gap-2 mb-5 text-slate-800">
+          <Filter className="h-5 w-5 text-blue-600" />
+          <h3 className="font-semibold text-lg">Filtrar Oportunidades</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="space-y-2">
+            <Label htmlFor="natureza" className="text-slate-600">
+              Natureza da Vaga
+            </Label>
+            <Select value={filtroNatureza} onValueChange={setFiltroNatureza}>
+              <SelectTrigger id="natureza" className="bg-slate-50 border-slate-200">
+                <SelectValue placeholder="Selecione a natureza" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todas">Todas</SelectItem>
+                <SelectItem value="Evento">Evento</SelectItem>
+                <SelectItem value="Diária">Diária</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="valorMin" className="text-slate-600">
+              Valor Mínimo (R$)
+            </Label>
+            <Input
+              id="valorMin"
+              type="number"
+              placeholder="Ex: 100"
+              value={filtroValorMin}
+              onChange={(e) => setFiltroValorMin(e.target.value)}
+              className="bg-slate-50 border-slate-200"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="valorMax" className="text-slate-600">
+              Valor Máximo (R$)
+            </Label>
+            <Input
+              id="valorMax"
+              type="number"
+              placeholder="Ex: 1000"
+              value={filtroValorMax}
+              onChange={(e) => setFiltroValorMax(e.target.value)}
+              className="bg-slate-50 border-slate-200"
+            />
+          </div>
+        </div>
+      </div>
+
+      {vagasFiltradas.length === 0 ? (
+        <Card className="border-dashed border-2 bg-slate-50/50 shadow-none">
           <CardContent className="flex flex-col items-center justify-center py-20 text-center">
             <div className="bg-white p-6 rounded-full shadow-sm mb-4">
               <Briefcase className="h-12 w-12 text-slate-300" />
             </div>
-            <h3 className="text-2xl font-semibold text-slate-900">
-              Nenhuma vaga aberta no momento
-            </h3>
+            <h3 className="text-2xl font-semibold text-slate-900">Nenhuma vaga encontrada</h3>
             <p className="text-slate-500 mt-2 text-lg">
-              Fique de olho! Novas oportunidades podem surgir a qualquer momento.
+              Tente ajustar os filtros ou volte mais tarde para novas oportunidades.
             </p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {vagas.map((vaga) => (
+          {vagasFiltradas.map((vaga) => (
             <Card
               key={vaga.id}
               className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-slate-200 bg-white flex flex-col h-full overflow-hidden group"
@@ -246,9 +361,8 @@ export default function VagasFeed() {
                   </div>
                   <div className="flex items-center text-sm text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
                     <Calendar className="h-4 w-4 mr-2.5 text-slate-400 shrink-0" />
-                    <span>
-                      {formatDate(vaga.data_inicio)}{' '}
-                      {vaga.data_fim ? `até ${formatDate(vaga.data_fim)}` : ''}
+                    <span className="line-clamp-1">
+                      {vaga.data_inicio ? formatDateTime(vaga.data_inicio) : 'Data a definir'}
                     </span>
                   </div>
                   <div className="flex items-center text-sm font-semibold text-emerald-700 bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-100">
@@ -268,14 +382,103 @@ export default function VagasFeed() {
                 </div>
               </CardContent>
               <CardFooter className="pt-0 pb-5 px-6">
-                <Button className="w-full bg-slate-900 hover:bg-blue-700 text-white font-medium py-5 shadow-sm transition-colors group-hover:shadow-md rounded-xl">
-                  Candidatar-se
+                <Button
+                  onClick={() => setVagaSelecionada(vaga)}
+                  variant="outline"
+                  className="w-full border-blue-200 text-blue-700 hover:bg-blue-50 font-medium py-5 transition-colors rounded-xl"
+                >
+                  Ver Detalhes
                 </Button>
               </CardFooter>
             </Card>
           ))}
         </div>
       )}
+
+      {/* Modal de Detalhes da Vaga */}
+      <Dialog open={!!vagaSelecionada} onOpenChange={(open) => !open && setVagaSelecionada(null)}>
+        <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="pb-4 border-b border-slate-100">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <Badge className="mb-3 bg-blue-100 text-blue-800 hover:bg-blue-200">
+                  {vagaSelecionada?.natureza || 'Geral'}
+                </Badge>
+                <DialogTitle className="text-2xl font-bold text-slate-900 leading-tight">
+                  {vagaSelecionada?.titulo}
+                </DialogTitle>
+                <p className="text-slate-500 font-medium mt-1">
+                  {vagaSelecionada?.empresas?.nome_empresa || 'Empresa Confidencial'}
+                </p>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="py-6 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-start gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <Calendar className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Período</p>
+                  <p className="text-sm text-slate-600 mt-1">
+                    Início: {formatDateTime(vagaSelecionada?.data_inicio)}
+                  </p>
+                  {vagaSelecionada?.data_fim && (
+                    <p className="text-sm text-slate-600">
+                      Fim: {formatDateTime(vagaSelecionada?.data_fim)}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <DollarSign className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Remuneração</p>
+                  <p className="text-lg text-emerald-700 font-bold mt-0.5">
+                    {vagaSelecionada?.valor_remuneracao
+                      ? formatCurrency(vagaSelecionada.valor_remuneracao)
+                      : 'A combinar'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <MapPin className="h-5 w-5 text-rose-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Localização Completa</p>
+                <p className="text-sm text-slate-600 mt-1">
+                  {vagaSelecionada?.endereco_vaga || 'Não informado'}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                <Info className="h-5 w-5 text-blue-600" />
+                Escopo do Trabalho
+              </h4>
+              <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">
+                {vagaSelecionada?.escopo_trabalho || 'Nenhum detalhe adicional fornecido.'}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="pt-4 border-t border-slate-100 gap-3 sm:gap-0">
+            <Button variant="outline" onClick={() => setVagaSelecionada(null)}>
+              Cancelar
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white min-w-[140px]"
+              onClick={handleAceitarVaga}
+              disabled={accepting}
+            >
+              {accepting ? 'Enviando...' : 'Aceitar Vaga'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

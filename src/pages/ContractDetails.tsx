@@ -50,6 +50,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { createDenuncia, uploadEvidencia } from '@/services/denuncias'
+import { supabase } from '@/lib/supabase/client'
 
 export default function ContractDetails() {
   const { user } = useAuth()
@@ -70,6 +71,9 @@ export default function ContractDetails() {
   const [arquivoEvidencia, setArquivoEvidencia] = useState<File | null>(null)
   const [enviandoDenuncia, setEnviandoDenuncia] = useState(false)
 
+  const [pagamento, setPagamento] = useState<any>(null)
+  const [recalculando, setRecalculando] = useState(false)
+
   useEffect(() => {
     async function load() {
       if (!id) return
@@ -79,11 +83,54 @@ export default function ContractDetails() {
         navigate('/contracts')
       } else {
         setContrato(data)
+
+        const { data: pagData } = await supabase
+          .from('pagamentos')
+          .select('*')
+          .eq('contrato_id', id)
+          .maybeSingle()
+
+        if (pagData) {
+          setPagamento(pagData)
+        } else {
+          recalcularPagamento(id, false)
+        }
       }
       setLoading(false)
     }
     load()
   }, [id, navigate, toast])
+
+  const recalcularPagamento = async (contratoId: string = id!, isManual: boolean = false) => {
+    setRecalculando(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('calcular-pagamento', {
+        body: { contrato_id: contratoId },
+      })
+      if (error) throw error
+      if (data?.success) {
+        setPagamento(data.data)
+        if (isManual) {
+          toast({
+            title: 'Sucesso',
+            description: 'Cálculo financeiro atualizado.',
+            variant: 'success',
+          })
+        }
+      }
+    } catch (err) {
+      console.error(err)
+      if (isManual) {
+        toast({
+          title: 'Erro',
+          description: 'Erro ao recalcular o pagamento.',
+          variant: 'destructive',
+        })
+      }
+    } finally {
+      setRecalculando(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -407,6 +454,61 @@ export default function ContractDetails() {
                       </Button>
                     </div>
                   )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-200 shadow-sm">
+            <CardHeader className="bg-slate-50 border-b border-slate-100 pb-4 flex flex-row items-center justify-between">
+              <CardTitle className="text-lg text-slate-800">Cálculo de Pagamento</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => recalcularPagamento(id, true)}
+                disabled={recalculando}
+              >
+                {recalculando ? 'Calculando...' : 'Recalcular'}
+              </Button>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-4">
+              {pagamento ? (
+                <>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-500">Total de Horas Trabalhadas:</span>
+                    <span className="font-semibold text-slate-900">{pagamento.total_horas}h</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-500">Valor da Hora:</span>
+                    <span className="font-semibold text-slate-900">
+                      {formatCurrency(pagamento.valor_hora)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-500">Subtotal:</span>
+                    <span className="font-semibold text-slate-900">
+                      {formatCurrency(pagamento.subtotal)}
+                    </span>
+                  </div>
+                  {pagamento.descontos > 0 && (
+                    <div className="flex justify-between items-center text-sm text-red-600">
+                      <span>Descontos (Penalidade):</span>
+                      <span className="font-semibold">- {formatCurrency(pagamento.descontos)}</span>
+                    </div>
+                  )}
+                  <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
+                    <span className="font-medium text-slate-900">Valor Final a Pagar:</span>
+                    <span className="text-xl font-bold text-primary">
+                      {formatCurrency(pagamento.valor_final)}
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-400 text-right mt-2">
+                    Última atualização: {new Date(pagamento.data_calculo).toLocaleString('pt-BR')}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center text-slate-500 text-sm py-4">
+                  Nenhum check-in registrado ou cálculo pendente.
                 </div>
               )}
             </CardContent>

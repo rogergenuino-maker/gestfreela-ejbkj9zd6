@@ -167,6 +167,7 @@ export type Database = {
       documentos_validacao: {
         Row: {
           arquivo_url: string | null
+          comentario: string | null
           created_at: string | null
           data_validade: string | null
           freelancer_id: string | null
@@ -176,6 +177,7 @@ export type Database = {
         }
         Insert: {
           arquivo_url?: string | null
+          comentario?: string | null
           created_at?: string | null
           data_validade?: string | null
           freelancer_id?: string | null
@@ -185,6 +187,7 @@ export type Database = {
         }
         Update: {
           arquivo_url?: string | null
+          comentario?: string | null
           created_at?: string | null
           data_validade?: string | null
           freelancer_id?: string | null
@@ -620,6 +623,7 @@ export const Constants = {
 //   data_validade: date (nullable)
 //   status_verificacao: text (nullable, default: 'pendente'::text)
 //   created_at: timestamp with time zone (nullable, default: now())
+//   comentario: text (nullable)
 // Table: empresas
 //   id: uuid (not null, default: gen_random_uuid())
 //   user_id: uuid (nullable)
@@ -740,8 +744,13 @@ export const Constants = {
 //     WITH CHECK: ((freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
 //   Policy "docs_select" (SELECT, PERMISSIVE) roles={authenticated}
 //     USING: ((freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
+//   Policy "docs_select_empresa" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: ((EXISTS ( SELECT 1    FROM empresas   WHERE (empresas.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
 //   Policy "docs_update" (UPDATE, PERMISSIVE) roles={authenticated}
 //     USING: ((freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
+//   Policy "docs_update_empresa" (UPDATE, PERMISSIVE) roles={authenticated}
+//     USING: ((EXISTS ( SELECT 1    FROM empresas   WHERE (empresas.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
+//     WITH CHECK: ((EXISTS ( SELECT 1    FROM empresas   WHERE (empresas.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
 // Table: empresas
 //   Policy "empresas_delete" (DELETE, PERMISSIVE) roles={authenticated}
 //     USING: ((user_id = auth.uid()) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))

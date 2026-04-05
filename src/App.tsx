@@ -14,6 +14,7 @@ import Freelancers from './pages/Freelancers'
 import FreelancerForm from './pages/FreelancerForm'
 import DocumentosUpload from './pages/DocumentosUpload'
 import VagasFeed from './pages/VagasFeed'
+import NovaVaga from './pages/NovaVaga'
 import Contracts from './pages/Contracts'
 import DocumentsAdmin from './pages/DocumentsAdmin'
 import NotFound from './pages/NotFound'
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/freelancers/new" element={<FreelancerForm />} />
               <Route path="/freelancers/documentos" element={<DocumentosUpload />} />
               <Route path="/vagas" element={<VagasFeed />} />
+              <Route path="/vagas/new" element={<NovaVaga />} />
               <Route path="/contracts" element={<Contracts />} />
               <Route path="/admin/documents" element={<DocumentsAdmin />} />
             </Route>

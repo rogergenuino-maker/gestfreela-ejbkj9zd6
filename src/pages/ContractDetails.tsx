@@ -159,6 +159,7 @@ export default function ContractDetails() {
     toast({
       title: 'Contrato Cancelado',
       description: 'Contrato cancelado e termo gerado com sucesso.',
+      variant: 'success',
     })
 
     setContrato({
@@ -210,7 +211,7 @@ export default function ContractDetails() {
       toast({
         title: 'Aviso',
         description: 'Por favor, permita pop-ups no seu navegador para gerar o PDF.',
-        variant: 'destructive',
+        variant: 'warning',
       })
     }
   }
@@ -239,6 +240,7 @@ export default function ContractDetails() {
       toast({
         title: 'Denúncia Enviada',
         description: 'Sua denúncia foi registrada e será analisada pela administração.',
+        variant: 'success',
       })
       setShowDenunciaDialog(false)
       setTipoDenuncia('')

@@ -74,6 +74,7 @@ export default function VagaDetails() {
       toast({
         title: 'Vaga pré-aceita!',
         description: 'Redirecionando para assinatura do contrato...',
+        variant: 'success',
       })
       navigate(`/contratos/${contrato.id}/assinar`)
     }

@@ -227,6 +227,7 @@ export default function Contracts() {
     toast({
       title: 'Contrato Cancelado',
       description: 'Notificação push enviada ao freelancer.',
+      variant: 'success',
     })
 
     setIsCancelOpen(false)

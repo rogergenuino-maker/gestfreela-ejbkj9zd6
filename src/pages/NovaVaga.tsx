@@ -115,6 +115,7 @@ export default function NovaVaga() {
       toast({
         title: 'Vaga publicada com sucesso!',
         description: 'A vaga já está disponível para os freelancers.',
+        variant: 'success',
       })
       navigate(-1)
     }

@@ -5,12 +5,13 @@ import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { MapPin, Clock, ArrowLeft, Loader2, LogIn, LogOut } from 'lucide-react'
-import { toast } from 'sonner'
+import { useToast } from '@/hooks/use-toast'
 
 export default function CheckinOperacional() {
   const { id: contrato_id } = useParams<{ id: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { toast } = useToast()
 
   const [isLoading, setIsLoading] = useState(true)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -68,7 +69,11 @@ export default function CheckinOperacional() {
         setCheckins(checkinsData || [])
       } catch (error) {
         console.error('Error loading data:', error)
-        toast.error('Erro ao carregar dados do contrato.')
+        toast({
+          title: 'Erro',
+          description: 'Erro ao carregar dados do contrato.',
+          variant: 'destructive',
+        })
       } finally {
         setIsLoading(false)
       }
@@ -79,7 +84,11 @@ export default function CheckinOperacional() {
 
   const handleRegister = async (tipo: 'Entrada' | 'Saída') => {
     if (!navigator.geolocation) {
-      toast.error('Geolocalização não suportada pelo navegador.')
+      toast({
+        title: 'Aviso',
+        description: 'Geolocalização não suportada pelo navegador.',
+        variant: 'warning',
+      })
       return
     }
 
@@ -106,7 +115,11 @@ export default function CheckinOperacional() {
             hour: '2-digit',
             minute: '2-digit',
           })
-          toast.success(`Check-in de ${tipo} realizado com sucesso às ${timeFormatted}!`)
+          toast({
+            title: 'Sucesso',
+            description: `Check-in de ${tipo} realizado com sucesso às ${timeFormatted}!`,
+            variant: 'success',
+          })
 
           // Refresh checkins
           const { data: checkinsData } = await supabase
@@ -120,14 +133,22 @@ export default function CheckinOperacional() {
           if (checkinsData) setCheckins(checkinsData)
         } catch (error) {
           console.error('Error registering:', error)
-          toast.error(`Erro ao registrar ${tipo}.`)
+          toast({
+            title: 'Erro',
+            description: `Erro ao registrar ${tipo}.`,
+            variant: 'destructive',
+          })
         } finally {
           setIsProcessing(false)
         }
       },
       (error) => {
         console.error('Geolocation error:', error)
-        toast.error('Ative a localização (GPS) para fazer o check-in.')
+        toast({
+          title: 'Atenção',
+          description: 'Ative a localização (GPS) para fazer o check-in.',
+          variant: 'warning',
+        })
         setIsProcessing(false)
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },

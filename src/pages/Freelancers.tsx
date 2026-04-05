@@ -68,7 +68,11 @@ export default function Freelancers() {
     if (error) {
       toast({ title: 'Erro', description: 'Erro ao excluir.', variant: 'destructive' })
     } else {
-      toast({ title: 'Sucesso', description: 'Freelancer excluído com sucesso.' })
+      toast({
+        title: 'Sucesso',
+        description: 'Freelancer excluído com sucesso.',
+        variant: 'success',
+      })
       fetchFreelancers()
     }
     setIsDeleting(false)

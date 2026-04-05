@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { differenceInHours, parseISO, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { ArrowLeft, Calendar, MapPin, User, AlertTriangle, XCircle } from 'lucide-react'
+import { ArrowLeft, Calendar, MapPin, User, AlertTriangle, XCircle, FileText } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { exportContractPDF } from '@/utils/pdfExport'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -126,18 +127,44 @@ export default function ContractDetails() {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
   }
 
+  const handleExportClick = () => {
+    const success = exportContractPDF(contrato, formatCurrency)
+    if (!success) {
+      toast({
+        title: 'Aviso',
+        description: 'Por favor, permita pop-ups no seu navegador para gerar o PDF.',
+        variant: 'destructive',
+      })
+    }
+  }
+
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4 animate-fade-in-up">
-      <div className="flex items-center gap-4 mb-8">
-        <Button variant="ghost" size="icon" asChild className="text-slate-500 hover:text-slate-900">
-          <Link to="/contracts">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Detalhes do Contrato</h1>
-          <p className="text-slate-500">Gerencie as informações e status desta contratação</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            asChild
+            className="text-slate-500 hover:text-slate-900"
+          >
+            <Link to="/contracts">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Detalhes do Contrato</h1>
+            <p className="text-slate-500">Gerencie as informações e status desta contratação</p>
+          </div>
         </div>
+        <Button
+          variant="outline"
+          className="text-blue-600 border-blue-200 hover:bg-blue-50 w-full sm:w-auto shadow-sm"
+          onClick={handleExportClick}
+        >
+          <FileText className="h-4 w-4 mr-2" />
+          Exportar PDF
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

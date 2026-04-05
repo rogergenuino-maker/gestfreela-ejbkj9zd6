@@ -2,7 +2,16 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { differenceInHours, parseISO, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { ArrowLeft, Calendar, MapPin, User, AlertTriangle, XCircle, FileText } from 'lucide-react'
+import {
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  User,
+  AlertTriangle,
+  XCircle,
+  FileText,
+  AlertOctagon,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { exportContractPDF } from '@/utils/pdfExport'
@@ -21,8 +30,29 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useToast } from '@/hooks/use-toast'
 import { getContratoById, cancelarContrato } from '@/services/contratos'
+import { useAuth } from '@/hooks/use-auth'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
+import { createDenuncia, uploadEvidencia } from '@/services/denuncias'
 
 export default function ContractDetails() {
+  const { user } = useAuth()
   const { id } = useParams()
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -31,6 +61,12 @@ export default function ContractDetails() {
   const [loading, setLoading] = useState(true)
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [canceling, setCanceling] = useState(false)
+
+  const [showDenunciaDialog, setShowDenunciaDialog] = useState(false)
+  const [tipoDenuncia, setTipoDenuncia] = useState('')
+  const [descricaoDenuncia, setDescricaoDenuncia] = useState('')
+  const [arquivoEvidencia, setArquivoEvidencia] = useState<File | null>(null)
+  const [enviandoDenuncia, setEnviandoDenuncia] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -135,6 +171,46 @@ export default function ContractDetails() {
         description: 'Por favor, permita pop-ups no seu navegador para gerar o PDF.',
         variant: 'destructive',
       })
+    }
+  }
+
+  const handleDenunciaSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!tipoDenuncia || !descricaoDenuncia || !user) return
+
+    setEnviandoDenuncia(true)
+    try {
+      let evidencias_url = null
+      if (arquivoEvidencia) {
+        evidencias_url = await uploadEvidencia(arquivoEvidencia)
+      }
+
+      const { error } = await createDenuncia({
+        contrato_id: id,
+        denunciante_id: user.id,
+        tipo_denuncia: tipoDenuncia,
+        descricao: descricaoDenuncia,
+        evidencias_url,
+      })
+
+      if (error) throw error
+
+      toast({
+        title: 'Denúncia Enviada',
+        description: 'Sua denúncia foi registrada e será analisada pela administração.',
+      })
+      setShowDenunciaDialog(false)
+      setTipoDenuncia('')
+      setDescricaoDenuncia('')
+      setArquivoEvidencia(null)
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível enviar a denúncia. Tente novamente.',
+        variant: 'destructive',
+      })
+    } finally {
+      setEnviandoDenuncia(false)
     }
   }
 
@@ -296,6 +372,17 @@ export default function ContractDetails() {
               </p>
             </div>
           )}
+
+          <div className="pt-2 animate-fade-in">
+            <Button
+              variant="outline"
+              className="w-full font-medium shadow-sm transition-all h-12 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+              onClick={() => setShowDenunciaDialog(true)}
+            >
+              <AlertOctagon className="w-5 h-5 mr-2" />
+              Denunciar Má Conduta
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -361,6 +448,74 @@ export default function ContractDetails() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={showDenunciaDialog} onOpenChange={setShowDenunciaDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Denunciar Má Conduta</DialogTitle>
+            <DialogDescription>
+              Preencha os detalhes da ocorrência. Esta denúncia será enviada diretamente para a
+              administração.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleDenunciaSubmit} className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="tipo">Tipo de Denúncia</Label>
+              <Select value={tipoDenuncia} onValueChange={setTipoDenuncia} required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Atraso">Atraso</SelectItem>
+                  <SelectItem value="Não Comparecimento">Não Comparecimento</SelectItem>
+                  <SelectItem value="Comportamento Inadequado">Comportamento Inadequado</SelectItem>
+                  <SelectItem value="Outro">Outro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="descricao">Descrição Detalhada</Label>
+              <Textarea
+                id="descricao"
+                required
+                maxLength={1000}
+                rows={4}
+                value={descricaoDenuncia}
+                onChange={(e) => setDescricaoDenuncia(e.target.value)}
+                placeholder="Descreva o que aconteceu em detalhes..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="evidencia">Anexar Evidências (Opcional)</Label>
+              <Input
+                id="evidencia"
+                type="file"
+                onChange={(e) => setArquivoEvidencia(e.target.files?.[0] || null)}
+                accept="image/*,.pdf,.doc,.docx"
+                className="cursor-pointer file:text-slate-600"
+              />
+              <p className="text-xs text-slate-500">Formatos aceitos: Imagens, PDF, Word.</p>
+            </div>
+            <DialogFooter className="mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowDenunciaDialog(false)}
+                disabled={enviandoDenuncia}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={enviandoDenuncia}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {enviandoDenuncia ? 'Enviando...' : 'Enviar Denúncia'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

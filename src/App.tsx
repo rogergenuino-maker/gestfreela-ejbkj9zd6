@@ -41,22 +41,31 @@ const App = () => (
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
               <Route path="/dashboard" element={<Index />} />
-              <Route path="/companies" element={<Companies />} />
-              <Route path="/freelancers" element={<Freelancers />} />
-              <Route path="/freelancers/new" element={<FreelancerForm />} />
-              <Route path="/freelancers/documentos" element={<DocumentosUpload />} />
               <Route path="/vagas" element={<VagasFeed />} />
-              <Route path="/vagas/new" element={<NovaVaga />} />
               <Route path="/vagas/:id" element={<VagaDetails />} />
+              <Route path="/contracts" element={<Contracts />} />
               <Route path="/contratos/:id" element={<ContractDetails />} />
               <Route path="/contratos/:id/assinar" element={<AssinaturaContrato />} />
-              <Route path="/contratos/:id/checkin" element={<CheckinOperacional />} />
               <Route path="/contratos/:id/avaliar" element={<AvaliacaoServico />} />
-              <Route path="/contracts" element={<Contracts />} />
-              <Route path="/ranking-freelancers" element={<RankingFreelancers />} />
-              <Route path="/mapa-presenca" element={<MapaPresenca />} />
-              <Route path="/relatorio-horas" element={<RelatorioHoras />} />
-              <Route path="/admin/documents" element={<DocumentsAdmin />} />
+
+              <Route element={<ProtectedRoute allowedRoles={['empresa']} />}>
+                <Route path="/companies" element={<Companies />} />
+                <Route path="/freelancers" element={<Freelancers />} />
+                <Route path="/freelancers/new" element={<FreelancerForm />} />
+                <Route path="/vagas/new" element={<NovaVaga />} />
+                <Route path="/ranking-freelancers" element={<RankingFreelancers />} />
+                <Route path="/mapa-presenca" element={<MapaPresenca />} />
+                <Route path="/relatorio-horas" element={<RelatorioHoras />} />
+              </Route>
+
+              <Route element={<ProtectedRoute allowedRoles={['freelancer']} />}>
+                <Route path="/freelancers/documentos" element={<DocumentosUpload />} />
+                <Route path="/contratos/:id/checkin" element={<CheckinOperacional />} />
+              </Route>
+
+              <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                <Route path="/admin/documents" element={<DocumentsAdmin />} />
+              </Route>
             </Route>
           </Route>
 

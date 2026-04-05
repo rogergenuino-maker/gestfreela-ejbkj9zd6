@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client'
 interface AuthContextType {
   user: User | null
   session: Session | null
+  userType: string | null
   signUp: (email: string, password: string, data?: any) => Promise<{ error: any; data?: any }>
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<{ error: any }>
@@ -22,7 +23,9 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
+  const [userType, setUserType] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [fetchingProfile, setFetchingProfile] = useState(true)
 
   useEffect(() => {
     const {
@@ -41,6 +44,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => subscription.unsubscribe()
   }, [])
+
+  useEffect(() => {
+    if (user) {
+      setFetchingProfile(true)
+      supabase
+        .from('users')
+        .select('user_type')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setUserType(data.user_type)
+          }
+          setFetchingProfile(false)
+        })
+    } else {
+      setUserType(null)
+      setFetchingProfile(false)
+    }
+  }, [user])
+
+  const isLoading = loading || (!!user && fetchingProfile)
 
   const signUp = async (email: string, password: string, data?: any) => {
     const { data: authData, error } = await supabase.auth.signUp({
@@ -65,7 +90,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, signUp, signIn, signOut, loading }}>
+    <AuthContext.Provider
+      value={{ user, session, userType, signUp, signIn, signOut, loading: isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   )

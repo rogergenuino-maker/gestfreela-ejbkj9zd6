@@ -9,6 +9,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      alertas_atraso: {
+        Row: {
+          contrato_id: string | null
+          data_hora_alerta: string | null
+          freelancer_id: string | null
+          id: string
+          mensagem: string
+          status: string | null
+          tipo_alerta: string
+        }
+        Insert: {
+          contrato_id?: string | null
+          data_hora_alerta?: string | null
+          freelancer_id?: string | null
+          id?: string
+          mensagem: string
+          status?: string | null
+          tipo_alerta: string
+        }
+        Update: {
+          contrato_id?: string | null
+          data_hora_alerta?: string | null
+          freelancer_id?: string | null
+          id?: string
+          mensagem?: string
+          status?: string | null
+          tipo_alerta?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'alertas_atraso_contrato_id_fkey'
+            columns: ['contrato_id']
+            isOneToOne: false
+            referencedRelation: 'contratos'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'alertas_atraso_freelancer_id_fkey'
+            columns: ['freelancer_id']
+            isOneToOne: false
+            referencedRelation: 'freelancers'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       avaliacoes_rating: {
         Row: {
           comentario: string | null
@@ -589,6 +634,14 @@ export const Constants = {
 // --- COLUMN TYPES (actual PostgreSQL types) ---
 // Use this to know the real database type when writing migrations.
 // "string" in TypeScript types above may be uuid, text, varchar, timestamptz, etc.
+// Table: alertas_atraso
+//   id: uuid (not null, default: gen_random_uuid())
+//   freelancer_id: uuid (nullable)
+//   contrato_id: uuid (nullable)
+//   tipo_alerta: text (not null)
+//   mensagem: text (not null)
+//   data_hora_alerta: timestamp with time zone (nullable, default: now())
+//   status: text (nullable, default: 'Pendente'::text)
 // Table: avaliacoes_rating
 //   id: uuid (not null, default: gen_random_uuid())
 //   contrato_id: uuid (nullable)
@@ -680,6 +733,10 @@ export const Constants = {
 //   created_at: timestamp with time zone (nullable, default: now())
 
 // --- CONSTRAINTS ---
+// Table: alertas_atraso
+//   FOREIGN KEY alertas_atraso_contrato_id_fkey: FOREIGN KEY (contrato_id) REFERENCES contratos(id) ON DELETE CASCADE
+//   FOREIGN KEY alertas_atraso_freelancer_id_fkey: FOREIGN KEY (freelancer_id) REFERENCES freelancers(id) ON DELETE CASCADE
+//   PRIMARY KEY alertas_atraso_pkey: PRIMARY KEY (id)
 // Table: avaliacoes_rating
 //   FOREIGN KEY avaliacoes_rating_contrato_id_fkey: FOREIGN KEY (contrato_id) REFERENCES contratos(id) ON DELETE CASCADE
 //   FOREIGN KEY avaliacoes_rating_empresa_id_fkey: FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
@@ -718,6 +775,13 @@ export const Constants = {
 //   PRIMARY KEY vagas_pkey: PRIMARY KEY (id)
 
 // --- ROW LEVEL SECURITY POLICIES ---
+// Table: alertas_atraso
+//   Policy "admin_all_alertas" (ALL, PERMISSIVE) roles={authenticated}
+//     USING: (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text))))
+//   Policy "empresas_podem_ver_seus_alertas" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: (contrato_id IN ( SELECT contratos.id    FROM contratos   WHERE (contratos.empresa_id IN ( SELECT empresas.id            FROM empresas           WHERE (empresas.user_id = auth.uid())))))
+//   Policy "freelancers_podem_ver_seus_alertas" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: (freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid())))
 // Table: avaliacoes_rating
 //   Policy "avaliacoes_insert" (INSERT, PERMISSIVE) roles={authenticated}
 //     WITH CHECK: ((empresa_id IN ( SELECT empresas.id    FROM empresas   WHERE (empresas.user_id = auth.uid()))) OR (freelancer_id IN ( SELECT freelancers.id    FROM freelancers   WHERE (freelancers.user_id = auth.uid()))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))

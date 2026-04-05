@@ -1,11 +1,24 @@
 import { useEffect, useState, useMemo } from 'react'
 import { format, subMonths, differenceInHours } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { DateRange } from 'react-day-picker'
 import { useAuth } from '@/hooks/use-auth'
 import { supabase } from '@/lib/supabase/client'
 import { cancelarContrato } from '@/services/contratos'
 import { useToast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -36,7 +49,17 @@ import {
 } from '@/components/ui/alert-dialog'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
-import { FileText, Ban, DollarSign, TrendingDown, Eye, AlertCircle } from 'lucide-react'
+import {
+  FileText,
+  Ban,
+  DollarSign,
+  TrendingDown,
+  Eye,
+  AlertCircle,
+  CalendarIcon,
+  Search,
+  X,
+} from 'lucide-react'
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)
@@ -52,6 +75,10 @@ export default function Contracts() {
 
   const [cancelPreview, setCancelPreview] = useState<any | null>(null)
   const [isCancelOpen, setIsCancelOpen] = useState(false)
+
+  const [dateRange, setDateRange] = useState<DateRange | undefined>()
+  const [searchName, setSearchName] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
 
   const fetchContracts = async () => {
     if (!user) return
@@ -126,6 +153,42 @@ export default function Contracts() {
     })
     return data
   }, [contracts])
+
+  const filteredContracts = useMemo(() => {
+    return contracts.filter((c) => {
+      const nameMatch =
+        c.freelancer?.nome_completo?.toLowerCase().includes(searchName.toLowerCase()) ?? false
+      if (searchName && !nameMatch) return false
+
+      if (statusFilter !== 'all' && c.status?.toLowerCase() !== statusFilter.toLowerCase())
+        return false
+
+      if (dateRange?.from) {
+        const contractDate = c.vaga?.data_inicio ? new Date(c.vaga.data_inicio) : null
+        if (!contractDate) return false
+
+        const fromDate = new Date(dateRange.from)
+        fromDate.setHours(0, 0, 0, 0)
+
+        if (!dateRange.to) {
+          if (contractDate < fromDate) return false
+        } else {
+          const toDate = new Date(dateRange.to)
+          toDate.setHours(23, 59, 59, 999)
+          if (contractDate < fromDate || contractDate > toDate) return false
+        }
+      }
+      return true
+    })
+  }, [contracts, searchName, statusFilter, dateRange])
+
+  const clearFilters = () => {
+    setSearchName('')
+    setStatusFilter('all')
+    setDateRange(undefined)
+  }
+
+  const hasActiveFilters = searchName !== '' || statusFilter !== 'all' || dateRange !== undefined
 
   const handleOpenCancel = (contract: any) => {
     if (!contract.vaga?.data_inicio) return
@@ -256,8 +319,83 @@ export default function Contracts() {
         </Card>
 
         <Card className="md:col-span-2 overflow-hidden flex flex-col">
-          <CardHeader>
-            <CardTitle>Contratos Recentes</CardTitle>
+          <CardHeader className="space-y-4 pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle>Contratos Recentes</CardTitle>
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="h-8 px-2 lg:px-3 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Limpar Filtros
+                </Button>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-3 md:flex-row md:items-center">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar freelancer..."
+                  className="pl-8 bg-background"
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                />
+              </div>
+
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full md:w-[180px] bg-background">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os Status</SelectItem>
+                  <SelectItem value="ativo">Ativo</SelectItem>
+                  <SelectItem value="aguardando_aceite">Aguardando Aceite</SelectItem>
+                  <SelectItem value="concluido">Concluído</SelectItem>
+                  <SelectItem value="cancelado">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="date"
+                    variant={'outline'}
+                    className={cn(
+                      'w-full md:w-[240px] justify-start text-left font-normal bg-background',
+                      !dateRange && 'text-muted-foreground',
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, 'dd/MM/yy')} - {format(dateRange.to, 'dd/MM/yy')}
+                        </>
+                      ) : (
+                        format(dateRange.from, 'dd/MM/yy')
+                      )
+                    ) : (
+                      <span>Filtrar por período</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={1}
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
           </CardHeader>
           <CardContent className="flex-1 p-0">
             <div className="overflow-x-auto">
@@ -273,14 +411,16 @@ export default function Contracts() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {contracts.length === 0 && !loading && (
+                  {filteredContracts.length === 0 && !loading && (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        Nenhum contrato encontrado.
+                        {hasActiveFilters
+                          ? 'Nenhum contrato encontrado para os filtros aplicados.'
+                          : 'Nenhum contrato encontrado.'}
                       </TableCell>
                     </TableRow>
                   )}
-                  {contracts.map((c) => (
+                  {filteredContracts.map((c) => (
                     <TableRow key={c.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">

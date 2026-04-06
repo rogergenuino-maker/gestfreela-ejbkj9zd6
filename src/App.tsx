@@ -49,7 +49,7 @@ const App = () => (
               <Route path="/dashboard" element={<Index />} />
               <Route path="/vagas" element={<VagasFeed />} />
               <Route path="/vagas/:id" element={<VagaDetails />} />
-              <Route path="/contracts" element={<Contracts />} />
+              <Route path="/contratos" element={<Contracts />} />
               <Route path="/contratos/:id" element={<ContractDetails />} />
               <Route path="/contratos/:id/assinar" element={<AssinaturaContrato />} />
               <Route path="/contratos/:id/avaliar" element={<AvaliacaoServico />} />
@@ -58,13 +58,13 @@ const App = () => (
               <Route path="/documentacao" element={<Documentation />} />
 
               <Route element={<ProtectedRoute allowedRoles={['empresa']} />}>
-                <Route path="/companies" element={<Companies />} />
+                <Route path="/empresas" element={<Companies />} />
                 <Route path="/freelancers" element={<Freelancers />} />
                 <Route path="/freelancers/new" element={<FreelancerForm />} />
                 <Route path="/vagas/new" element={<NovaVaga />} />
                 <Route path="/ranking-freelancers" element={<RankingFreelancers />} />
                 <Route path="/mapa-presenca" element={<MapaPresenca />} />
-                <Route path="/relatorio-horas" element={<RelatorioHoras />} />
+                <Route path="/horas" element={<RelatorioHoras />} />
               </Route>
 
               <Route element={<ProtectedRoute allowedRoles={['freelancer']} />}>
@@ -73,10 +73,10 @@ const App = () => (
               </Route>
 
               <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-                <Route path="/admin/documents" element={<DocumentsAdmin />} />
-                <Route path="/admin/alertas" element={<AdminAlerts />} />
-                <Route path="/admin/metrics" element={<MetricsDashboard />} />
-                <Route path="/admin/relatorios-avancados" element={<RelatoriosAvancados />} />
+                <Route path="/documentos" element={<DocumentsAdmin />} />
+                <Route path="/alertas" element={<AdminAlerts />} />
+                <Route path="/metricas" element={<MetricsDashboard />} />
+                <Route path="/relatorios" element={<RelatoriosAvancados />} />
               </Route>
             </Route>
           </Route>

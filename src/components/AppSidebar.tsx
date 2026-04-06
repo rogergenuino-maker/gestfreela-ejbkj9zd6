@@ -31,14 +31,14 @@ import { Badge } from '@/components/ui/badge'
 const menuItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Mensagens', url: '/mensagens', icon: MessageSquare },
-  { title: 'Cadastro de Empresas', url: '/companies', icon: Building2 },
+  { title: 'Cadastro de Empresas', url: '/empresas', icon: Building2 },
   { title: 'Cadastro de Freelancers', url: '/freelancers', icon: Users },
-  { title: 'Gestão de Contratos', url: '/contracts', icon: FileText },
-  { title: 'Validação de Documentos', url: '/admin/documents', icon: ShieldCheck },
-  { title: 'Alertas', url: '/admin/alertas', icon: AlertTriangle },
-  { title: 'Dashboard de Métricas', url: '/admin/metrics', icon: TrendingUp },
-  { title: 'Relatórios Avançados', url: '/admin/relatorios-avancados', icon: BarChart3 },
-  { title: 'Relatório de Horas', url: '/relatorio-horas', icon: Clock },
+  { title: 'Gestão de Contratos', url: '/contratos', icon: FileText },
+  { title: 'Validação de Documentos', url: '/documentos', icon: ShieldCheck },
+  { title: 'Alertas', url: '/alertas', icon: AlertTriangle },
+  { title: 'Dashboard de Métricas', url: '/metricas', icon: TrendingUp },
+  { title: 'Relatórios Avançados', url: '/relatorios', icon: BarChart3 },
+  { title: 'Relatório de Horas', url: '/horas', icon: Clock },
   { title: 'Documentação', url: '/documentacao', icon: BookOpen },
 ]
 

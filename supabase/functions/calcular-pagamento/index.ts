@@ -4,7 +4,8 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, x-supabase-client-platform, apikey, content-type',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, x-supabase-client-platform, apikey, content-type',
 }
 
 Deno.serve(async (req: Request) => {
@@ -21,7 +22,7 @@ Deno.serve(async (req: Request) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
+
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Missing Supabase environment variables')
     }
@@ -64,43 +65,54 @@ Deno.serve(async (req: Request) => {
 
     if (contratoError) throw contratoError
 
-    const taxaFreelancer = contrato.freelancers && typeof contrato.freelancers === 'object' && 'taxa_hora' in contrato.freelancers ? contrato.freelancers.taxa_hora : 0;
-    const valorRemuneracaoVaga = contrato.vagas && typeof contrato.vagas === 'object' && 'valor_remuneracao' in contrato.vagas ? contrato.vagas.valor_remuneracao : 0;
+    const taxaFreelancer =
+      contrato.freelancers &&
+      typeof contrato.freelancers === 'object' &&
+      'taxa_hora' in contrato.freelancers
+        ? contrato.freelancers.taxa_hora
+        : 0
+    const valorRemuneracaoVaga =
+      contrato.vagas && typeof contrato.vagas === 'object' && 'valor_remuneracao' in contrato.vagas
+        ? contrato.vagas.valor_remuneracao
+        : 0
 
     const valor_hora = taxaFreelancer || valorRemuneracaoVaga || 0
     const subtotal = total_horas * valor_hora
-    
+
     const descontos = contrato.penalidade_aplicada ? subtotal * 0.1 : 0
     const valor_final = subtotal - descontos
 
     // Salvar na tabela pagamentos
-    const { error: upsertError } = await supabase
-      .from('pagamentos')
-      .upsert({
+    const { error: upsertError } = await supabase.from('pagamentos').upsert(
+      {
         contrato_id,
         total_horas,
         valor_hora,
         subtotal,
         descontos,
         valor_final,
-        data_calculo: new Date().toISOString()
-      }, { onConflict: 'contrato_id' })
+        data_calculo: new Date().toISOString(),
+      },
+      { onConflict: 'contrato_id' },
+    )
 
     if (upsertError) throw upsertError
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      data: { contrato_id, total_horas, valor_hora, subtotal, descontos, valor_final } 
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200
-    })
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: { contrato_id, total_horas, valor_hora, subtotal, descontos, valor_final },
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      },
+    )
   } catch (error: any) {
     console.error('Erro na Edge Function calcular-pagamento:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500
+      status: 500,
     })
   }
 })

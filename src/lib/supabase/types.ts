@@ -463,6 +463,47 @@ export type Database = {
         }
         Relationships: []
       }
+      pagamentos: {
+        Row: {
+          contrato_id: string
+          data_calculo: string | null
+          descontos: number | null
+          id: string
+          subtotal: number | null
+          total_horas: number | null
+          valor_final: number | null
+          valor_hora: number | null
+        }
+        Insert: {
+          contrato_id: string
+          data_calculo?: string | null
+          descontos?: number | null
+          id?: string
+          subtotal?: number | null
+          total_horas?: number | null
+          valor_final?: number | null
+          valor_hora?: number | null
+        }
+        Update: {
+          contrato_id?: string
+          data_calculo?: string | null
+          descontos?: number | null
+          id?: string
+          subtotal?: number | null
+          total_horas?: number | null
+          valor_final?: number | null
+          valor_hora?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'pagamentos_contrato_id_fkey'
+            columns: ['contrato_id']
+            isOneToOne: true
+            referencedRelation: 'contratos'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       perfis: {
         Row: {
           created_at: string | null
@@ -799,6 +840,15 @@ export const Constants = {
 //   conteudo: text (not null)
 //   lido: boolean (not null, default: false)
 //   data_envio: timestamp with time zone (not null, default: now())
+// Table: pagamentos
+//   id: uuid (not null, default: gen_random_uuid())
+//   contrato_id: uuid (not null)
+//   total_horas: numeric (nullable, default: 0)
+//   valor_hora: numeric (nullable, default: 0)
+//   subtotal: numeric (nullable, default: 0)
+//   descontos: numeric (nullable, default: 0)
+//   valor_final: numeric (nullable, default: 0)
+//   data_calculo: timestamp with time zone (nullable, default: now())
 // Table: perfis
 //   id: uuid (not null)
 //   lgpd_aceito: boolean (nullable, default: false)
@@ -864,6 +914,10 @@ export const Constants = {
 //   FOREIGN KEY mensagens_destinatario_id_fkey: FOREIGN KEY (destinatario_id) REFERENCES auth.users(id) ON DELETE CASCADE
 //   PRIMARY KEY mensagens_pkey: PRIMARY KEY (id)
 //   FOREIGN KEY mensagens_remetente_id_fkey: FOREIGN KEY (remetente_id) REFERENCES auth.users(id) ON DELETE CASCADE
+// Table: pagamentos
+//   FOREIGN KEY pagamentos_contrato_id_fkey: FOREIGN KEY (contrato_id) REFERENCES contratos(id) ON DELETE CASCADE
+//   UNIQUE pagamentos_contrato_id_key: UNIQUE (contrato_id)
+//   PRIMARY KEY pagamentos_pkey: PRIMARY KEY (id)
 // Table: perfis
 //   FOREIGN KEY perfis_id_fkey: FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
 //   PRIMARY KEY perfis_pkey: PRIMARY KEY (id)
@@ -951,6 +1005,14 @@ export const Constants = {
 //   Policy "mensagens_update" (UPDATE, PERMISSIVE) roles={authenticated}
 //     USING: (auth.uid() = destinatario_id)
 //     WITH CHECK: (auth.uid() = destinatario_id)
+// Table: pagamentos
+//   Policy "pagamentos_insert" (INSERT, PERMISSIVE) roles={authenticated}
+//     WITH CHECK: true
+//   Policy "pagamentos_select" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: ((contrato_id IN ( SELECT contratos.id    FROM contratos   WHERE ((contratos.empresa_id IN ( SELECT empresas.id            FROM empresas           WHERE (empresas.user_id = auth.uid()))) OR (contratos.freelancer_id IN ( SELECT freelancers.id            FROM freelancers           WHERE (freelancers.user_id = auth.uid())))))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
+//   Policy "pagamentos_update" (UPDATE, PERMISSIVE) roles={authenticated}
+//     USING: true
+//     WITH CHECK: true
 // Table: perfis
 //   Policy "perfis_insert" (INSERT, PERMISSIVE) roles={authenticated}
 //     WITH CHECK: (id = auth.uid())
@@ -1039,3 +1101,7 @@ export const Constants = {
 // --- TRIGGERS ---
 // Table: contratos
 //   on_contrato_signed: CREATE TRIGGER on_contrato_signed AFTER UPDATE ON public.contratos FOR EACH ROW EXECUTE FUNCTION update_vaga_on_contrato_signed()
+
+// --- INDEXES ---
+// Table: pagamentos
+//   CREATE UNIQUE INDEX pagamentos_contrato_id_key ON public.pagamentos USING btree (contrato_id)

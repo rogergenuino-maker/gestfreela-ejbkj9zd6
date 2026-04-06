@@ -8,6 +8,7 @@ import {
   Clock,
   LogOut,
   MessageSquare,
+  AlertTriangle,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -31,6 +32,7 @@ const menuItems = [
   { title: 'Cadastro de Freelancers', url: '/freelancers', icon: Users },
   { title: 'Gestão de Contratos', url: '/contracts', icon: FileText },
   { title: 'Validação de Documentos', url: '/admin/documents', icon: ShieldCheck },
+  { title: 'Alertas', url: '/admin/alertas', icon: AlertTriangle },
   { title: 'Relatório de Horas', url: '/relatorio-horas', icon: Clock },
 ]
 

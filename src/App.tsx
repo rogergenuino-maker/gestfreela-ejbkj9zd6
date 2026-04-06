@@ -19,6 +19,7 @@ import VagaDetails from './pages/VagaDetails'
 import AssinaturaContrato from './pages/AssinaturaContrato'
 import Contracts from './pages/Contracts'
 import DocumentsAdmin from './pages/DocumentsAdmin'
+import AdminAlerts from './pages/AdminAlerts'
 import ContractDetails from './pages/ContractDetails'
 import Messages from './pages/Messages'
 import CheckinOperacional from './pages/CheckinOperacional'
@@ -69,6 +70,7 @@ const App = () => (
 
               <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                 <Route path="/admin/documents" element={<DocumentsAdmin />} />
+                <Route path="/admin/alertas" element={<AdminAlerts />} />
               </Route>
             </Route>
           </Route>

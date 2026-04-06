@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { format, subDays, isAfter } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { AlertTriangle, CheckCircle, Clock } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Clock, ArrowLeft } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import {
@@ -26,6 +27,7 @@ import { fetchAlertas, updateAlertaStatus, Alerta } from '@/services/alertas'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function AdminAlerts() {
+  const navigate = useNavigate()
   const [alertas, setAlertas] = useState<Alerta[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -85,15 +87,25 @@ export default function AdminAlerts() {
 
   return (
     <div className="container mx-auto p-4 max-w-7xl animate-fade-in">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
-            <AlertTriangle className="h-8 w-8 text-amber-500" />
-            Dashboard de Alertas
-          </h1>
-          <p className="text-slate-500 mt-1">
-            Monitore e gerencie atrasos, inconsistências e denúncias.
-          </p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-white p-6 rounded-xl border border-blue-100 shadow-sm">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="shrink-0 text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-blue-900 flex items-center gap-2">
+              <AlertTriangle className="h-8 w-8 text-amber-500" />
+              Dashboard de Alertas
+            </h1>
+            <p className="text-blue-600/80 mt-1">
+              Monitore e gerencie atrasos, inconsistências e denúncias.
+            </p>
+          </div>
         </div>
       </div>
 

@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { Search } from 'lucide-react'
+import { Search, ArrowLeft } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { useNavigate } from 'react-router-dom'
 import {
   Table,
   TableBody,
@@ -17,6 +19,7 @@ import { useToast } from '@/hooks/use-toast'
 import { fetchRelatorioHoras, RelatorioHora } from '@/services/relatorios'
 
 export default function RelatorioHoras() {
+  const navigate = useNavigate()
   const [data, setData] = useState<RelatorioHora[]>([])
   const [loading, setLoading] = useState(true)
   const [filterContrato, setFilterContrato] = useState('')
@@ -72,14 +75,22 @@ export default function RelatorioHoras() {
 
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6 animate-fade-in-up">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-blue-900">
-            Relatório de Horas Trabalhadas
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Auditoria de jornada e presença dos freelancers
-          </p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl border border-blue-100 shadow-sm">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="shrink-0 text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-blue-900">
+              Relatório de Horas Trabalhadas
+            </h1>
+            <p className="text-blue-600/80 mt-1">Auditoria de jornada e presença dos freelancers</p>
+          </div>
         </div>
       </div>
 

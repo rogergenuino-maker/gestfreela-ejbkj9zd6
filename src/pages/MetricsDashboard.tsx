@@ -12,8 +12,10 @@ import {
   Star,
   CheckCircle,
   FileText,
+  ArrowLeft,
 } from 'lucide-react'
 import { DateRange } from 'react-day-picker'
+import { useNavigate } from 'react-router-dom'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -49,6 +51,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function MetricsDashboard() {
+  const navigate = useNavigate()
   const [date, setDate] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
@@ -140,11 +143,23 @@ export default function MetricsDashboard() {
   return (
     <div className="flex flex-col gap-6 p-6 w-full max-w-7xl mx-auto animate-fade-in">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-blue-100 shadow-sm">
-        <div>
-          <h1 className="text-3xl font-bold text-blue-900 tracking-tight">Dashboard de Métricas</h1>
-          <p className="text-blue-600/80 mt-1">
-            Acompanhe os indicadores de desempenho da plataforma.
-          </p>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="shrink-0 text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-blue-900 tracking-tight">
+              Dashboard de Métricas
+            </h1>
+            <p className="text-blue-600/80 mt-1">
+              Acompanhe os indicadores de desempenho da plataforma.
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">

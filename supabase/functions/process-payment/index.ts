@@ -46,7 +46,7 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
     // Registra o pagamento processado na tabela
@@ -58,7 +58,7 @@ Deno.serve(async (req: Request) => {
         valor_pago: amount,
         status_stripe,
         transaction_id,
-        data_pagamento: new Date().toISOString()
+        data_pagamento: new Date().toISOString(),
       })
       .select()
       .single()

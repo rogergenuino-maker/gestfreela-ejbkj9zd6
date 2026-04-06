@@ -37,11 +37,13 @@ import {
   Pie,
   Cell,
 } from 'recharts'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ArrowLeft } from 'lucide-react'
 import { fetchAdvancedReports, AdvancedReportsData } from '@/services/relatorios-avancados'
 import { useToast } from '@/hooks/use-toast'
+import { useNavigate } from 'react-router-dom'
 
 export default function RelatoriosAvancados() {
+  const navigate = useNavigate()
   const { toast } = useToast()
 
   const [startDate, setStartDate] = useState<string>(() => {
@@ -94,12 +96,24 @@ export default function RelatoriosAvancados() {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Relatórios Avançados</h1>
-          <p className="text-muted-foreground">
-            Análise profunda de tendências, performance e métricas.
-          </p>
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-6 rounded-xl border border-blue-100 shadow-sm">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="shrink-0 text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-blue-900">
+              Relatórios Avançados
+            </h1>
+            <p className="text-blue-600/80 mt-1">
+              Análise profunda de tendências, performance e métricas.
+            </p>
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Input

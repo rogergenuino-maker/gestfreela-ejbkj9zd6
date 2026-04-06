@@ -11,8 +11,17 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { fetchAllDocuments, updateDocumentStatus, DocumentInfo } from '@/services/documents'
-import { CheckCircle2, XCircle, FileSearch, ShieldCheck, Download, Loader2 } from 'lucide-react'
+import {
+  CheckCircle2,
+  XCircle,
+  FileSearch,
+  ShieldCheck,
+  Download,
+  Loader2,
+  ArrowLeft,
+} from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { useNavigate } from 'react-router-dom'
 import {
   Dialog,
   DialogContent,
@@ -24,6 +33,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 
 export default function DocumentsAdmin() {
+  const navigate = useNavigate()
   const [documents, setDocuments] = useState<DocumentInfo[]>([])
   const [loading, setLoading] = useState(true)
   const [rejectingDoc, setRejectingDoc] = useState<DocumentInfo | null>(null)
@@ -120,14 +130,24 @@ export default function DocumentsAdmin() {
 
   return (
     <div className="space-y-6 animate-fade-in-up">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-blue-950 flex items-center gap-2">
-          <ShieldCheck className="h-8 w-8 text-blue-600" />
-          Validação de Documentos
-        </h1>
-        <p className="text-muted-foreground">
-          Gerencie e valide os documentos obrigatórios enviados pelos freelancers.
-        </p>
+      <div className="flex items-center gap-4 bg-white p-6 rounded-xl border border-blue-100 shadow-sm">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => navigate(-1)}
+          className="shrink-0 text-blue-600 border-blue-200 hover:bg-blue-50"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-bold tracking-tight text-blue-900 flex items-center gap-2">
+            <ShieldCheck className="h-8 w-8 text-blue-600" />
+            Validação de Documentos
+          </h1>
+          <p className="text-blue-600/80">
+            Gerencie e valide os documentos obrigatórios enviados pelos freelancers.
+          </p>
+        </div>
       </div>
 
       <Card className="border-border/50 shadow-sm">

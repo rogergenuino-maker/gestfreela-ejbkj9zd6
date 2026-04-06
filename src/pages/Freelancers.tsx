@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Plus, Edit, Trash2, Search, Eye } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Plus, Edit, Trash2, Search, Eye, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -33,6 +33,7 @@ interface Freelancer {
 }
 
 export default function Freelancers() {
+  const navigate = useNavigate()
   const [freelancers, setFreelancers] = useState<Freelancer[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [formacaoFilter, setFormacaoFilter] = useState('all')
@@ -101,12 +102,20 @@ export default function Freelancers() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-blue-900">Freelancers</h1>
-          <p className="text-muted-foreground mt-1">
-            Gerencie sua base de profissionais e talentos.
-          </p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-xl border border-blue-100 shadow-sm">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="shrink-0 text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-blue-900">Freelancers</h1>
+            <p className="text-blue-600/80 mt-1">Gerencie sua base de profissionais e talentos.</p>
+          </div>
         </div>
         <Button
           asChild

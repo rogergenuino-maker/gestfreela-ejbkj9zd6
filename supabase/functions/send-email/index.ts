@@ -34,7 +34,12 @@ const sendResendEmail = async (to: string[], subject: string, html: string) => {
   return await res.json()
 }
 
-const getEmailTemplate = (title: string, content: string, actionLink?: string, actionText?: string) => `
+const getEmailTemplate = (
+  title: string,
+  content: string,
+  actionLink?: string,
+  actionText?: string,
+) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -84,10 +89,10 @@ Deno.serve(async (req: Request) => {
 
   try {
     const { type, data } = await req.json()
-    
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
+
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Missing environment variables for Supabase.')
     }
@@ -99,7 +104,9 @@ Deno.serve(async (req: Request) => {
       const { contratoId } = data
       const { data: contrato } = await supabase
         .from('contratos')
-        .select('*, vagas(titulo), empresas(nome_empresa, email), freelancers(nome_completo, email)')
+        .select(
+          '*, vagas(titulo), empresas(nome_empresa, email), freelancers(nome_completo, email)',
+        )
         .eq('id', contratoId)
         .single()
 
@@ -110,14 +117,14 @@ Deno.serve(async (req: Request) => {
         const empresaNome = contrato.empresas?.nome_empresa || 'Empresa'
 
         const subject = `Novo Contrato Criado: ${vagaTitulo}`
-        
+
         if (empresaEmail) {
           const htmlEmpresa = getEmailTemplate(
             'Novo Contrato Registrado',
             `<p>Um novo contrato foi criado e atrelado à vaga <strong>${vagaTitulo}</strong>.</p>
              <p>O freelancer <strong>${contrato.freelancers?.nome_completo}</strong> está alocado para este projeto. Acompanhe o status e os check-ins diretamente pelo seu painel.</p>`,
             `${appUrl}/contratos/${contratoId}`,
-            'Acessar Contrato'
+            'Acessar Contrato',
           )
           await sendResendEmail([empresaEmail], subject, htmlEmpresa)
         }
@@ -128,7 +135,7 @@ Deno.serve(async (req: Request) => {
             `<p>Você foi selecionado e alocado em um novo contrato para a vaga <strong>${vagaTitulo}</strong> pela empresa <strong>${empresaNome}</strong>.</p>
              <p>Por favor, acesse a plataforma o quanto antes para revisar as informações, ler os termos e realizar a assinatura digital.</p>`,
             `${appUrl}/contratos/${contratoId}`,
-            'Revisar e Assinar Contrato'
+            'Revisar e Assinar Contrato',
           )
           await sendResendEmail([freelancerEmail], subject, htmlFreelancer)
         }
@@ -137,7 +144,9 @@ Deno.serve(async (req: Request) => {
       const { contratoId } = data
       const { data: contrato } = await supabase
         .from('contratos')
-        .select('*, vagas(titulo), empresas(nome_empresa, email), freelancers(nome_completo, email)')
+        .select(
+          '*, vagas(titulo), empresas(nome_empresa, email), freelancers(nome_completo, email)',
+        )
         .eq('id', contratoId)
         .single()
 
@@ -153,7 +162,7 @@ Deno.serve(async (req: Request) => {
            <p><strong>Motivo do cancelamento:</strong> ${contrato.motivo_cancelamento || 'Não especificado no registro.'}</p>
            <p>Acesse a plataforma para verificar mais detalhes operacionais e consultar o termo de cancelamento gerado, se aplicável.</p>`,
           `${appUrl}/contratos/${contratoId}`,
-          'Ver Detalhes do Contrato'
+          'Ver Detalhes do Contrato',
         )
 
         if (empresaEmail) await sendResendEmail([empresaEmail], subject, html)
@@ -174,15 +183,15 @@ Deno.serve(async (req: Request) => {
           .not('email', 'is', null)
 
         if (freelancers && freelancers.length > 0) {
-          const emails = freelancers.map(f => f.email).filter(Boolean) as string[]
-          
+          const emails = freelancers.map((f) => f.email).filter(Boolean) as string[]
+
           const subject = `Nova Oportunidade: ${vaga.titulo}`
           const html = getEmailTemplate(
             'Nova Vaga Publicada',
             `<p>A empresa <strong>${vaga.empresas?.nome_empresa}</strong> acabou de publicar uma nova oportunidade no GestFreela que pode ser do seu interesse: <strong>${vaga.titulo}</strong>.</p>
              <p>Acesse a plataforma rapidamente para conferir os requisitos, escopo de trabalho e informações sobre a remuneração.</p>`,
             `${appUrl}/vagas/${vagaId}`,
-            'Visualizar Vaga'
+            'Visualizar Vaga',
           )
 
           for (const email of emails) {
@@ -206,7 +215,7 @@ Deno.serve(async (req: Request) => {
            <p>Gostaríamos de informar que sua documentação foi validada com sucesso e seu perfil agora está <strong>100% ativo</strong> no GestFreela.</p>
            <p>Você já está liberado para acessar as vagas disponíveis na plataforma, candidatar-se e começar a trabalhar com as melhores empresas.</p>`,
           `${appUrl}/vagas`,
-          'Encontrar Oportunidades'
+          'Encontrar Oportunidades',
         )
 
         await sendResendEmail([freelancer.email], subject, html)

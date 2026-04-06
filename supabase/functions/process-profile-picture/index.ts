@@ -17,7 +17,7 @@ Deno.serve(async (req: Request) => {
 
     // Extrai os dados em base64 da string (removendo o prefixo)
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '')
-    const buffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0))
+    const buffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0))
 
     // Validação de tamanho (5MB) baseada no tamanho do buffer (aproximado)
     if (buffer.length > 5 * 1024 * 1024) {
@@ -25,7 +25,7 @@ Deno.serve(async (req: Request) => {
     }
 
     // Processamento e otimização usando sharp (redimensiona para 500x500, formato JPEG, 80% qualidade)
-    let optimizedBuffer = buffer;
+    let optimizedBuffer = buffer
     try {
       optimizedBuffer = await sharp(buffer)
         .resize(500, 500, { fit: 'cover' })
@@ -38,7 +38,7 @@ Deno.serve(async (req: Request) => {
     // Instancia o cliente do Supabase utilizando a Service Role Key (Admin)
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
     const filePath = `${userId}/profile-${Date.now()}.jpg`
@@ -48,7 +48,7 @@ Deno.serve(async (req: Request) => {
       .from('profile-pictures')
       .upload(filePath, optimizedBuffer, {
         contentType: 'image/jpeg',
-        upsert: true
+        upsert: true,
       })
 
     if (uploadError) throw uploadError

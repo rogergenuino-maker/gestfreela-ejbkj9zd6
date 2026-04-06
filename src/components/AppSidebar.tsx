@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -24,6 +25,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/hooks/use-auth'
 import { useUnreadMessages } from '@/hooks/use-messages'
 import { Badge } from '@/components/ui/badge'
@@ -31,21 +33,46 @@ import { Badge } from '@/components/ui/badge'
 const menuItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Mensagens', url: '/mensagens', icon: MessageSquare },
-  { title: 'Cadastro de Empresas', url: '/empresas', icon: Building2 },
-  { title: 'Cadastro de Freelancers', url: '/freelancers', icon: Users },
+  { title: 'Cadastro de Empresas', url: '/empresas', icon: Building2, roles: ['empresa', 'admin'] },
+  {
+    title: 'Cadastro de Freelancers',
+    url: '/freelancers',
+    icon: Users,
+    roles: ['empresa', 'admin'],
+  },
   { title: 'Gestão de Contratos', url: '/contratos', icon: FileText },
-  { title: 'Validação de Documentos', url: '/documentos', icon: ShieldCheck },
-  { title: 'Alertas', url: '/alertas', icon: AlertTriangle },
-  { title: 'Dashboard de Métricas', url: '/metricas', icon: TrendingUp },
-  { title: 'Relatórios Avançados', url: '/relatorios', icon: BarChart3 },
-  { title: 'Relatório de Horas', url: '/horas', icon: Clock },
+  { title: 'Validação de Documentos', url: '/documentos', icon: ShieldCheck, roles: ['admin'] },
+  { title: 'Alertas', url: '/alertas', icon: AlertTriangle, roles: ['admin'] },
+  { title: 'Dashboard de Métricas', url: '/metricas', icon: TrendingUp, roles: ['admin'] },
+  { title: 'Relatórios Avançados', url: '/relatorios', icon: BarChart3, roles: ['admin'] },
+  { title: 'Relatório de Horas', url: '/horas', icon: Clock, roles: ['empresa', 'admin'] },
   { title: 'Documentação', url: '/documentacao', icon: BookOpen },
 ]
 
 export function AppSidebar() {
   const location = useLocation()
-  const { signOut } = useAuth()
+  const { signOut, user } = useAuth()
   const unreadCount = useUnreadMessages()
+  const [userRole, setUserRole] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from('users')
+        .select('user_type')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) setUserRole(data.user_type)
+        })
+    }
+  }, [user])
+
+  const filteredMenuItems = menuItems.filter((item) => {
+    if (!item.roles) return true
+    if (!userRole) return false
+    return item.roles.includes(userRole)
+  })
 
   return (
     <Sidebar>
@@ -56,7 +83,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => {
+              {filteredMenuItems.map((item) => {
                 const isActive = location.pathname === item.url
                 return (
                   <SidebarMenuItem key={item.title}>

@@ -57,7 +57,7 @@ const App = () => (
               <Route path="/mensagens" element={<Messages />} />
               <Route path="/documentacao" element={<Documentation />} />
 
-              <Route element={<ProtectedRoute allowedRoles={['empresa']} />}>
+              <Route element={<ProtectedRoute allowedRoles={['empresa', 'admin']} />}>
                 <Route path="/empresas" element={<Companies />} />
                 <Route path="/freelancers" element={<Freelancers />} />
                 <Route path="/freelancers/new" element={<FreelancerForm />} />
@@ -67,7 +67,7 @@ const App = () => (
                 <Route path="/horas" element={<RelatorioHoras />} />
               </Route>
 
-              <Route element={<ProtectedRoute allowedRoles={['freelancer']} />}>
+              <Route element={<ProtectedRoute allowedRoles={['freelancer', 'admin']} />}>
                 <Route path="/freelancers/documentos" element={<DocumentosUpload />} />
                 <Route path="/contratos/:id/checkin" element={<CheckinOperacional />} />
               </Route>

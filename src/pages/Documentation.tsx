@@ -21,7 +21,7 @@ function CodeBlock({ code, title }: { code: string; title?: string }) {
   const handleCopy = () => {
     navigator.clipboard.writeText(code)
     setCopied(true)
-    toast.success('Instruções copiadas para a área de transferência!')
+    toast.success('Copiado para a área de transferência!')
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -40,7 +40,7 @@ function CodeBlock({ code, title }: { code: string; title?: string }) {
           ) : (
             <Copy className="h-4 w-4 mr-1.5" />
           )}
-          {copied ? 'Copiado' : 'Copiar Instruções'}
+          {copied ? 'Copiado' : 'Copiar'}
         </Button>
       </div>
       <div className="p-4 overflow-x-auto">
@@ -172,13 +172,11 @@ npm run dev`}
 ├── public/             # Assets públicos (imagens estáticas, favicon, etc)
 ├── src/                # Código-fonte principal da aplicação React (Frontend)
 │   ├── components/     # Componentes de UI reutilizáveis (Shadcn) e layouts
-│   ├── hooks/          # Hooks customizados do React (ex: useAuth, useToast)
-│   ├── lib/            # Utilitários e configurações (cliente Supabase, Tailwind utils)
+│   ├── hooks/          # Hooks customizados do React
+│   ├── lib/            # Utilitários e configurações
 │   ├── pages/          # Telas principais correspondentes às rotas da aplicação
 │   └── services/       # Abstração para chamadas à API e lógica de negócios externa
-├── supabase/           # Configurações de backend (Supabase)
-│   ├── functions/      # Edge Functions rodando em Deno no lado do servidor
-│   └── migrations/     # Scripts SQL para versionamento do banco de dados
+├── supabase/           # Configurações de backend
 ├── .env.local          # Variáveis de ambiente locais (não versionado)
 └── package.json        # Manifesto do projeto contendo dependências e scripts`}
                 />
@@ -192,31 +190,29 @@ npm run dev`}
             <CardHeader className="bg-blue-50/50 border-b border-blue-50 pb-4">
               <CardTitle className="text-blue-900">Variáveis de Ambiente</CardTitle>
               <CardDescription className="text-blue-600/80 text-base mt-1">
-                Configurações essenciais para conectar a aplicação ao Supabase.
+                Configurações genéricas para a aplicação.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="prose prose-blue max-w-none text-slate-700">
                 <p className="mb-4">
                   Crie um arquivo chamado <code>.env.local</code> na raiz do seu projeto e adicione
-                  as credenciais fornecidas no seu painel do Supabase. Lembre-se: este arquivo nunca
-                  deve ser commitado.
+                  as variáveis necessárias. Lembre-se: este arquivo nunca deve ser commitado.
                 </p>
                 <CodeBlock
                   title="Arquivo: .env.local"
-                  code={`# Configurações de conexão do Banco de Dados e Autenticação (Supabase)
-VITE_SUPABASE_URL=sua_url_do_supabase_aqui
-VITE_SUPABASE_ANON_KEY=sua_chave_anon_do_supabase_aqui`}
+                  code={`# Configurações gerais da aplicação
+VITE_APP_NAME="GestFreela"
+VITE_APP_VERSION="1.0.0"`}
                 />
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mt-6">
                   <h4 className="text-sm font-bold text-blue-900 mb-1 flex items-center">
                     <FileKey className="h-4 w-4 mr-2" /> Aviso de Segurança
                   </h4>
                   <p className="text-sm text-blue-800 m-0">
-                    A chave <code>VITE_SUPABASE_ANON_KEY</code> é segura para ser exposta no
-                    frontend do React. A proteção real dos dados é garantida pelas políticas RLS
-                    (Row Level Security) configuradas diretamente no banco de dados. Nunca exponha
-                    chaves de "Service Role" neste arquivo.
+                    Mantenha suas variáveis de ambiente seguras. Nunca adicione valores reais de
+                    senhas ou chaves de API diretamente no código-fonte ou repita-os em ambientes
+                    não seguros.
                   </p>
                 </div>
               </div>

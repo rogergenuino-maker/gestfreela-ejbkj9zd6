@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   TrendingUp,
   BarChart3,
+  BookOpen,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -38,6 +39,7 @@ const menuItems = [
   { title: 'Dashboard de Métricas', url: '/admin/metrics', icon: TrendingUp },
   { title: 'Relatórios Avançados', url: '/admin/relatorios-avancados', icon: BarChart3 },
   { title: 'Relatório de Horas', url: '/relatorio-horas', icon: Clock },
+  { title: 'Documentação', url: '/documentacao', icon: BookOpen },
 ]
 
 export function AppSidebar() {

@@ -13,10 +13,12 @@ Deno.serve(async (req: Request) => {
     const enrichedCheckins = await Promise.all(
       (checkins || []).map(async (checkin: any) => {
         let address = 'Endereço aproximado não disponível'
-        
+
         if (apiKey && checkin.latitude && checkin.longitude) {
           try {
-            const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${checkin.latitude},${checkin.longitude}&key=${apiKey}`)
+            const res = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${checkin.latitude},${checkin.longitude}&key=${apiKey}`,
+            )
             const data = await res.json()
             if (data.results && data.results.length > 0) {
               address = data.results[0].formatted_address
@@ -28,17 +30,20 @@ Deno.serve(async (req: Request) => {
         } else {
           address = `Lat: ${Number(checkin.latitude).toFixed(4)}, Lng: ${Number(checkin.longitude).toFixed(4)}`
         }
-        
+
         return { ...checkin, endereco_aproximado: address }
-      })
+      }),
     )
 
-    return new Response(JSON.stringify({ 
-      checkins: enrichedCheckins,
-      apiKey: apiKey || null 
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({
+        checkins: enrichedCheckins,
+        apiKey: apiKey || null,
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
+    )
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 400,

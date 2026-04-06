@@ -30,6 +30,7 @@ import MapaPresenca from './pages/MapaPresenca'
 import RelatorioHoras from './pages/RelatorioHoras'
 import RelatoriosAvancados from './pages/RelatoriosAvancados'
 import Profile from './pages/Profile'
+import Documentation from './pages/Documentation'
 import NotFound from './pages/NotFound'
 
 const App = () => (
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="/contratos/:id/avaliar" element={<AvaliacaoServico />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/mensagens" element={<Messages />} />
+              <Route path="/documentacao" element={<Documentation />} />
 
               <Route element={<ProtectedRoute allowedRoles={['empresa']} />}>
                 <Route path="/companies" element={<Companies />} />

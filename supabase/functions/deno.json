@@ -5,6 +5,7 @@
     "notificar-denuncia": 1,
     "process-profile-picture": 1,
     "send-email": 1,
-    "calcular-pagamento": 1
+    "calcular-pagamento": 1,
+    "process-payment": 1
   }
 }

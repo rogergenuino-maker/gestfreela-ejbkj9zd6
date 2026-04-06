@@ -9,6 +9,7 @@ import {
   LogOut,
   MessageSquare,
   AlertTriangle,
+  TrendingUp,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -33,6 +34,7 @@ const menuItems = [
   { title: 'Gestão de Contratos', url: '/contracts', icon: FileText },
   { title: 'Validação de Documentos', url: '/admin/documents', icon: ShieldCheck },
   { title: 'Alertas', url: '/admin/alertas', icon: AlertTriangle },
+  { title: 'Dashboard de Métricas', url: '/admin/metrics', icon: TrendingUp },
   { title: 'Relatório de Horas', url: '/relatorio-horas', icon: Clock },
 ]
 

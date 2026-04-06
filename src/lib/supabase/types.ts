@@ -504,6 +504,54 @@ export type Database = {
           },
         ]
       }
+      pagamentos_processados: {
+        Row: {
+          contrato_id: string
+          created_at: string
+          data_pagamento: string
+          freelancer_id: string
+          id: string
+          status_stripe: string
+          transaction_id: string
+          valor_pago: number
+        }
+        Insert: {
+          contrato_id: string
+          created_at?: string
+          data_pagamento?: string
+          freelancer_id: string
+          id?: string
+          status_stripe: string
+          transaction_id: string
+          valor_pago: number
+        }
+        Update: {
+          contrato_id?: string
+          created_at?: string
+          data_pagamento?: string
+          freelancer_id?: string
+          id?: string
+          status_stripe?: string
+          transaction_id?: string
+          valor_pago?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'pagamentos_processados_contrato_id_fkey'
+            columns: ['contrato_id']
+            isOneToOne: false
+            referencedRelation: 'contratos'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'pagamentos_processados_freelancer_id_fkey'
+            columns: ['freelancer_id']
+            isOneToOne: false
+            referencedRelation: 'freelancers'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       perfis: {
         Row: {
           created_at: string | null
@@ -849,6 +897,15 @@ export const Constants = {
 //   descontos: numeric (nullable, default: 0)
 //   valor_final: numeric (nullable, default: 0)
 //   data_calculo: timestamp with time zone (nullable, default: now())
+// Table: pagamentos_processados
+//   id: uuid (not null, default: gen_random_uuid())
+//   contrato_id: uuid (not null)
+//   freelancer_id: uuid (not null)
+//   valor_pago: numeric (not null)
+//   data_pagamento: timestamp with time zone (not null, default: now())
+//   status_stripe: text (not null)
+//   transaction_id: text (not null)
+//   created_at: timestamp with time zone (not null, default: now())
 // Table: perfis
 //   id: uuid (not null)
 //   lgpd_aceito: boolean (nullable, default: false)
@@ -918,6 +975,10 @@ export const Constants = {
 //   FOREIGN KEY pagamentos_contrato_id_fkey: FOREIGN KEY (contrato_id) REFERENCES contratos(id) ON DELETE CASCADE
 //   UNIQUE pagamentos_contrato_id_key: UNIQUE (contrato_id)
 //   PRIMARY KEY pagamentos_pkey: PRIMARY KEY (id)
+// Table: pagamentos_processados
+//   FOREIGN KEY pagamentos_processados_contrato_id_fkey: FOREIGN KEY (contrato_id) REFERENCES contratos(id) ON DELETE CASCADE
+//   FOREIGN KEY pagamentos_processados_freelancer_id_fkey: FOREIGN KEY (freelancer_id) REFERENCES freelancers(id) ON DELETE CASCADE
+//   PRIMARY KEY pagamentos_processados_pkey: PRIMARY KEY (id)
 // Table: perfis
 //   FOREIGN KEY perfis_id_fkey: FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
 //   PRIMARY KEY perfis_pkey: PRIMARY KEY (id)
@@ -1011,6 +1072,16 @@ export const Constants = {
 //   Policy "pagamentos_select" (SELECT, PERMISSIVE) roles={authenticated}
 //     USING: ((contrato_id IN ( SELECT contratos.id    FROM contratos   WHERE ((contratos.empresa_id IN ( SELECT empresas.id            FROM empresas           WHERE (empresas.user_id = auth.uid()))) OR (contratos.freelancer_id IN ( SELECT freelancers.id            FROM freelancers           WHERE (freelancers.user_id = auth.uid())))))) OR (EXISTS ( SELECT 1    FROM users   WHERE ((users.id = auth.uid()) AND (users.user_type = 'admin'::text)))))
 //   Policy "pagamentos_update" (UPDATE, PERMISSIVE) roles={authenticated}
+//     USING: true
+//     WITH CHECK: true
+// Table: pagamentos_processados
+//   Policy "pagamentos_processados_delete" (DELETE, PERMISSIVE) roles={authenticated}
+//     USING: true
+//   Policy "pagamentos_processados_insert" (INSERT, PERMISSIVE) roles={authenticated}
+//     WITH CHECK: true
+//   Policy "pagamentos_processados_select" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: true
+//   Policy "pagamentos_processados_update" (UPDATE, PERMISSIVE) roles={authenticated}
 //     USING: true
 //     WITH CHECK: true
 // Table: perfis

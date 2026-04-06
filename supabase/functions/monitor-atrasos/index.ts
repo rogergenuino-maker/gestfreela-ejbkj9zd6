@@ -10,7 +10,7 @@ Deno.serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-
+    
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Missing environment variables for Supabase.')
     }
@@ -71,14 +71,14 @@ Deno.serve(async (req: Request) => {
 
           if (!existingAlert || existingAlert.length === 0) {
             const dataInicio = new Date((contrato.vagas as any).data_inicio)
-
+            
             // Format hour to HH:MM in PT-BR timezone
-            const horaInicio = dataInicio.toLocaleTimeString('pt-BR', {
-              hour: '2-digit',
+            const horaInicio = dataInicio.toLocaleTimeString('pt-BR', { 
+              hour: '2-digit', 
               minute: '2-digit',
-              timeZone: 'America/Sao_Paulo',
+              timeZone: 'America/Sao_Paulo'
             })
-
+            
             const freelancerNome = (contrato.freelancers as any).nome_completo
             const mensagem = `Alerta: Freelancer ${freelancerNome} não realizou check-in até as ${horaInicio}`
 
@@ -89,7 +89,7 @@ Deno.serve(async (req: Request) => {
                 contrato_id: contrato.id,
                 tipo_alerta: 'Atraso Check-in',
                 mensagem: mensagem,
-                status: 'Pendente',
+                status: 'Pendente'
               })
               .select()
               .single()
@@ -106,23 +106,21 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'Monitoramento concluído',
-        alertsCreated: alertsCreated.length,
-        alerts: alertsCreated,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ 
+      success: true,
+      message: "Monitoramento concluído", 
+      alertsCreated: alertsCreated.length,
+      alerts: alertsCreated
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200
+    })
+
   } catch (error: any) {
     console.error('Erro na Edge Function de Monitoramento:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
+      status: 500
     })
   }
 })

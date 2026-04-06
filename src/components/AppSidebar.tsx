@@ -10,6 +10,7 @@ import {
   MessageSquare,
   AlertTriangle,
   TrendingUp,
+  BarChart3,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -35,6 +36,7 @@ const menuItems = [
   { title: 'Validação de Documentos', url: '/admin/documents', icon: ShieldCheck },
   { title: 'Alertas', url: '/admin/alertas', icon: AlertTriangle },
   { title: 'Dashboard de Métricas', url: '/admin/metrics', icon: TrendingUp },
+  { title: 'Relatórios Avançados', url: '/admin/relatorios-avancados', icon: BarChart3 },
   { title: 'Relatório de Horas', url: '/relatorio-horas', icon: Clock },
 ]
 

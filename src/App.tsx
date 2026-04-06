@@ -28,6 +28,7 @@ import AvaliacaoServico from './pages/AvaliacaoServico'
 import RankingFreelancers from './pages/RankingFreelancers'
 import MapaPresenca from './pages/MapaPresenca'
 import RelatorioHoras from './pages/RelatorioHoras'
+import RelatoriosAvancados from './pages/RelatoriosAvancados'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 
@@ -73,6 +74,7 @@ const App = () => (
                 <Route path="/admin/documents" element={<DocumentsAdmin />} />
                 <Route path="/admin/alertas" element={<AdminAlerts />} />
                 <Route path="/admin/metrics" element={<MetricsDashboard />} />
+                <Route path="/admin/relatorios-avancados" element={<RelatoriosAvancados />} />
               </Route>
             </Route>
           </Route>

@@ -18,6 +18,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { cn } from '@/lib/utils'
+import { Download } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import * as Papa from 'papaparse'
+import * as XLSX from 'xlsx'
 import {
   ChartContainer,
   ChartTooltip,
@@ -61,6 +70,46 @@ export default function MetricsDashboard() {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
   }
 
+  const handleExport = (formatType: 'csv' | 'excel') => {
+    if (!metrics || !date?.from) return
+
+    const dataToExport = [
+      {
+        'Período Início': format(date.from, 'dd/MM/yyyy'),
+        'Período Fim': date.to ? format(date.to, 'dd/MM/yyyy') : format(date.from, 'dd/MM/yyyy'),
+        'Receita Total (R$)': metrics.receitaTotal,
+        'Total de Contratos': metrics.totalContratos,
+        'Contratos Ativos': metrics.contratosAtivos,
+        'Contratos Concluídos': metrics.contratosConcluidos,
+        'Contratos Cancelados': metrics.contratosCancelados,
+        'Total de Freelancers': metrics.totalFreelancers,
+        'Freelancers Aprovados': metrics.freelancersAprovados,
+        'Freelancers Pendentes': metrics.freelancersPendentes,
+        'Total de Empresas': metrics.totalEmpresas,
+        'Taxa de Conclusão (%)': Number(metrics.taxaConclusao.toFixed(2)),
+        'Avaliação Média': Number(metrics.avaliacaoMedia.toFixed(2)),
+        'Denúncias Pendentes': metrics.denunciasPendentes,
+      },
+    ]
+
+    if (formatType === 'csv') {
+      const csv = Papa.unparse(dataToExport)
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `metricas_${format(new Date(), 'yyyy-MM-dd')}.csv`)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } else {
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Métricas')
+      XLSX.writeFile(workbook, `metricas_${format(new Date(), 'yyyy-MM-dd')}.xlsx`)
+    }
+  }
+
   const chartConfig = {
     revenue: {
       label: 'Receita',
@@ -98,43 +147,65 @@ export default function MetricsDashboard() {
           </p>
         </div>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              id="date"
-              variant={'outline'}
-              className={cn(
-                'w-full sm:w-[300px] justify-start text-left font-normal border-blue-200 text-blue-900 hover:bg-blue-50',
-                !date && 'text-muted-foreground',
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4 text-blue-500" />
-              {date?.from ? (
-                date.to ? (
-                  <>
-                    {format(date.from, "dd 'de' MMM, yyyy", { locale: ptBR })} -{' '}
-                    {format(date.to, "dd 'de' MMM, yyyy", { locale: ptBR })}
-                  </>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="date"
+                variant={'outline'}
+                className={cn(
+                  'w-full sm:w-[300px] justify-start text-left font-normal border-blue-200 text-blue-900 hover:bg-blue-50',
+                  !date && 'text-muted-foreground',
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4 text-blue-500" />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "dd 'de' MMM, yyyy", { locale: ptBR })} -{' '}
+                      {format(date.to, "dd 'de' MMM, yyyy", { locale: ptBR })}
+                    </>
+                  ) : (
+                    format(date.from, "dd 'de' MMM, yyyy", { locale: ptBR })
+                  )
                 ) : (
-                  format(date.from, "dd 'de' MMM, yyyy", { locale: ptBR })
-                )
-              ) : (
-                <span>Selecione o período</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="end">
-            <Calendar
-              initialFocus
-              mode="range"
-              defaultMonth={date?.from}
-              selected={date}
-              onSelect={setDate}
-              numberOfMonths={2}
-              locale={ptBR}
-            />
-          </PopoverContent>
-        </Popover>
+                  <span>Selecione o período</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={2}
+                locale={ptBR}
+              />
+            </PopoverContent>
+          </Popover>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={loading || !metrics}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Exportar Relatório
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExport('csv')} className="cursor-pointer">
+                Exportar como CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('excel')} className="cursor-pointer">
+                Exportar como Excel (.xlsx)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {loading || !metrics ? (
